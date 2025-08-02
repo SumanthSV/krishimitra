@@ -21,6 +21,7 @@ import SettingsPage from './pages/SettingsPage';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { LocationProvider } from './contexts/LocationContext';
 import { OfflineDataProvider } from './contexts/OfflineDataContext';
+import { getOfflineService } from './services/OfflineService';
 
 const theme = createTheme({
   palette: {
@@ -50,6 +51,7 @@ function App() {
     getOfflineService().catch(error => {
       console.error('Failed to initialize offline service:', error);
     });
+    
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
