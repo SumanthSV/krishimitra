@@ -1,0 +1,41 @@
+{
+  "name": "krishimitra",
+  "version": "1.0.0",
+  "description": "AI-Powered Agricultural Advisor for Indian Farmers",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "npm run kill-ports && concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "kill-ports": "npx kill-port 3000 5000",
+    "client:dev": "cd client && npm start",
+    "server:dev": "cd server && npm run dev",
+    "client:build": "cd client && npm run build",
+    "server:build": "cd server && npm run build",
+    "build": "npm run client:build && npm run server:build",
+    "start": "cd server && npm start",
+    "test": "npm run client:test && npm run server:test",
+    "client:test": "cd client && npm test",
+    "server:test": "cd server && npm test",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "agriculture",
+    "ai",
+    "farming",
+    "india",
+    "advisor",
+    "multilingual"
+  ],
+  "author": "KrishiMitra Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

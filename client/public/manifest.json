@@ -1,0 +1,33 @@
+{
+  "short_name": "KrishiMitra",
+  "name": "KrishiMitra - AI Agricultural Advisor",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#4caf50",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "categories": ["agriculture", "productivity", "education"],
+  "description": "AI-powered agricultural advisor for Indian farmers providing insights on crops, weather, finance, and policies",
+  "dir": "ltr",
+  "lang": "en-US",
+  "prefer_related_applications": false
+}
