@@ -28,11 +28,18 @@ import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 
 // Contexts
+<<<<<<< HEAD
 import { LanguageProvider } from './contexts/LanguageContext.tsx';
 import { LocationProvider } from './contexts/LocationContext.tsx';
 import { OfflineDataProvider } from './contexts/OfflineDataContext.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { getOfflineService } from './services/OfflineService.ts';
+=======
+import { LanguageProvider } from './contexts/LanguageContext';
+import { LocationProvider } from './contexts/LocationContext';
+import { OfflineDataProvider } from './contexts/OfflineDataContext';
+import { getOfflineService } from './services/OfflineService';
+>>>>>>> 80234744171ebc6b5412a958112010fc029dccdf
 
 const theme = createTheme({
   palette: {
