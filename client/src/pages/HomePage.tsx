@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 // import {  Grass, AccountBalance, QuestionAnswer, ArrowForward } from '@mui/icons-material';
 import { useLanguage } from '../contexts/LanguageContext.tsx';
 import { useLocation } from '../contexts/LocationContext.tsx';
+// import HomepageImage from '../assests/Land-Property-removebg-preview-Picsart-AiImageEnhancer.png'
+// import HomepageImage from '../assests/Forest.png'
+import HomepageImage from '../assests/Forest-2.png'
 import {
   Sprout,
   Banknote,
@@ -12,8 +15,8 @@ import {
 
 const translations = {
   en: {
-    welcome: 'Welcome to KrishiMitra',
-    tagline: 'Your AI-powered agricultural advisor',
+    welcome: 'for Agriculture, Made Simple',
+    tagline: 'Let KrishiMitra guide every step of your agricultural journey.',
     askQuestion: 'Ask a Question',
     weatherTitle: 'Weather Forecast',
     weatherDesc: 'Get real-time weather updates and forecasts for your region',
@@ -58,50 +61,77 @@ const HomePage = () => {
   };
 
   return (
-    <div className="max-w-7xl  mx-auto px-4 py-10 space-y-10 text-gray-800">
+    <div   className=" -mt-16 mx-auto max-w-9xl bg-white space-y-0 text-gray-800">
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-green-600 via-green-800 to-black text-white rounded-2xl shadow-lg p-10">
+      <div  style={{
+    backgroundImage: `url(${HomepageImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    // maxWidth:'1280px'
+  }} className="h-screen flex flex-row items-center justify-start">
+      {/* <section className="bg-gradient-to-r from-green-600 via-green-800 to-black text-white rounded-2xl shadow-lg p-10"> */}
+      <section className="text-green-500 rounded-2xl ml-20 p-10">
         <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold leading-tight">{t.welcome}</h1>
-            <p className="text-lg mt-2 opacity-90">{t.tagline}</p>
+          <div className="flex-1 max-w-2xl">
+
+            
+            <h1 className="text-7xl text-[#0f5d23]  font-extralight leading-tight"><span className="text-7xl text-[#0f5d23] font-extrabold   leading-tight">AI</span> {t.welcome}</h1>
+            <p className="text-xl mt-2 text-[#154123] opacity-90">{t.tagline}</p>
             <Link
               to="/chat"
-              className="mt-4 inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-zinc-700 font-semibold py-2 px-5 rounded-md transition duration-200"
+              className="mt-4 inline-flex items-center gap-2 bg-white shadow-[0px_0px_4px_1px_green] hover:shadow-[0px_0px_6px_1px_green] hover:bg-green-50 text-zinc-700 font-semibold py-2 px-5 rounded-md transition duration-200"
             >
               <Sprout size={20} />
               {t.askQuestion}
             </Link>
           </div>
-          <div className="w-40 hidden md:block">
+          {/* <div className="w-40 hidden md:block">
             <img src="/logo.svg" alt="KrishiMitra Logo" className="w-full drop-shadow-xl" />
-          </div>
+          </div> */}
         </div>
       </section>
+      {/* <section>
+        <img className="h-[700px]" src={HomepageImage} alt="" />
+      </section> */}
+      </div>
+      
 
       {/* Location Based Advice */}
-      <section className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+      <section className="bg-white rounded-2xl  p-6 space-y-4">
         <h2 className="text-2xl font-semibold text-gray-900">{t.localizedAdvice}</h2>
-        <div className="text-gray-700 text-sm">
-          {locationData.district && locationData.state ? (
-            <p>{t.basedOnLocation} <strong>{locationData.district}, {locationData.state}</strong></p>
-          ) : locationData.coordinates ? (
-            <p>{t.basedOnLocation} <strong>{locationData.coordinates.latitude.toFixed(2)}, {locationData.coordinates.longitude.toFixed(2)}</strong></p>
-          ) : (
-            <div className="flex items-center gap-3">
-              <span>
-                {locationData.isLoading ? 'Detecting location...' : 'Location not set'}
-              </span>
-              <Link
-                to="/settings"
-                className="border border-gray-400 text-sm px-3 py-1 rounded hover:bg-gray-100"
-              >
-                {t.setLocation}
-              </Link>
-            </div>
-          )}
-        </div>
+        <div className="text-gray-700 text-sm px-4 py-2 rounded-md bg-white/60 backdrop-blur-md shadow-sm border border-gray-200">
+  {locationData.district && locationData.state ? (
+    <p>
+      {t.basedOnLocation}{' '}
+      <strong className="text-gray-900">
+        {locationData.district}, {locationData.state}
+      </strong>
+    </p>
+  ) : locationData.coordinates ? (
+    <p>
+      {t.basedOnLocation}{' '}
+      <strong className="text-gray-900">
+        {locationData.coordinates.latitude.toFixed(2)},
+        {locationData.coordinates.longitude.toFixed(2)}
+      </strong>
+    </p>
+  ) : (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-gray-600">
+        {locationData.isLoading ? 'Detecting location...' : 'Location not set'}
+      </span>
+      <Link
+        to="/settings"
+        className="border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium hover:bg-gray-100 transition"
+      >
+        {t.setLocation}
+      </Link>
+    </div>
+  )}
+</div>
+
 
         {(locationData.district || locationData.coordinates) && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 text-center">
@@ -126,7 +156,7 @@ const HomePage = () => {
       </section>
 
       {/* Recent Updates */}
-      <section>
+      <section className='p-10'>
         <h2 className="text-3xl font-bold mb-6">{t.recentUpdates}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Weather Card */}

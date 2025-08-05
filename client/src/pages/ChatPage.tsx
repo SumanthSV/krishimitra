@@ -15,6 +15,8 @@ import {
   X,
   MessageSquare,
   Sparkles,
+  Bot,
+  User
 } from "lucide-react"
 
 // Types for chat functionality
@@ -463,26 +465,30 @@ const ChatPage: React.FC = () => {
   const currentSession = getCurrentSession();
 
   return (
-    <div className="flex h-screen overflow-hidden">
+   <div className="flex h-[90vh] bg-gradient-to-br from-gray-50 to-white">
       {/* Sidebar */}
       <div
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed lg:relative lg:translate-x-0 z-30 w-80 h-full bg-white/80 backdrop-blur-xl border-r border-slate-200/60 transition-transform duration-300 ease-out shadow-xl lg:shadow-none`}
+        } fixed lg:relative lg:translate-x-0 z- w-72 h-full bg-white/95 backdrop-blur-xl border-r border-gray-200/50 transition-transform duration-300 ease-out shadow-2xl lg:shadow-none`}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full fixed">
           {/* Sidebar Header */}
-          <div className="p-6 border-b border-slate-200/60 bg-gradient-to-r from-emerald-500 to-teal-600">
+          <div className="p-6 border-b border-gray-200/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                  {/* <Sparkles className="w-6 h-6 text-white" /> */}
+                  <h1>K</h1>
                 </div>
-                <h1 className="text-xl font-bold text-white">AI Chat</h1>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">Krishimitra</h1>
+                  <p className="text-xs text-gray-500">AI Agricultural Assistant</p>
+                </div>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="lg:hidden text-white/80 hover:text-white transition-colors p-1"
+                className="lg:hidden text-gray-800 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -491,10 +497,14 @@ const ChatPage: React.FC = () => {
             {/* New Chat Button */}
             <button
               onClick={createNewSession}
-              className="w-full mt-4 flex items-center justify-center gap-2 bg-white/20 hover:bg-white/30 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30"
+              className="w-full mt-6 flex items-center justify-center  border text-zinc-800 font-medium py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              <Plus className="w-5 h-5" />
-              {t("chat.newChat")}
+              <div className="">  
+                <Plus className="w-20 h-5" />
+                <span>{t("chat.newChat")}</span>
+              
+              </div>
+              
             </button>
           </div>
 
@@ -502,8 +512,8 @@ const ChatPage: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-4">
             {sessions.length === 0 ? (
               <div className="text-center py-12">
-                <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500 text-sm">{t("chat.noChats")}</p>
+                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">{t("chat.noChats")}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -517,28 +527,20 @@ const ChatPage: React.FC = () => {
                           setCurrentSessionId(session.id)
                           if (window.innerWidth < 1024) setSidebarOpen(false)
                         }}
-                        className={`group flex items-start p-4 rounded-xl cursor-pointer transition-all duration-200 ${
+                        className={`group flex items-start py-2 px-4 rounded-xl cursor-pointer transition-all duration-200 ${
                           isActive
-                            ? "bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-white-200 shadow-sm"
-                            : "hover:bg-slate-50 border-2 border-transparent hover:border-slate-200"
+                            ? "bg-zinc-200 border border-emerald-200/50 shadow-sm"
+                            : "hover:bg-gray-50 border border-transparent"
                         }`}
                       >
                         <div className="flex-1 min-w-0">
                           <p
                             className={`text-sm font-semibold truncate ${
-                              isActive ? "text-white-700" : "text-slate-700"
+                              isActive ? "text-zinc-700" : "text-gray-700"
                             }`}
                           >
-                            {session.title}
+                            {session.title.slice(0,23)} {session.title.length > 22 ? "..." : ""}
                           </p>
-                          <div className="flex items-center mt-2 space-x-2">
-                            {session.category && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-emerald-100 text-emerald-700">
-                                {getCategoryLabel(session.category)}
-                              </span>
-                            )}
-                            <span className="text-xs text-slate-500">{formatDate(session.updatedAt)}</span>
-                          </div>
                         </div>
 
                         {/* Menu Button */}
@@ -547,7 +549,7 @@ const ChatPage: React.FC = () => {
                             e.stopPropagation()
                             toggleSessionMenu(session.id)
                           }}
-                          className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-600 transition-all duration-200 p-1 rounded-lg hover:bg-white/50"
+                          className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 transition-all duration-200 p-1.5 rounded-lg hover:bg-white/80"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -555,7 +557,7 @@ const ChatPage: React.FC = () => {
 
                       {/* Context Menu */}
                       {isMenuOpen && (
-                        <div className="absolute right-2 top-16 z-40 w-48 bg-white shadow-xl rounded-xl border border-slate-200 py-2 backdrop-blur-xl">
+                        <div className="absolute right-2 top-16 z-40 w-48 bg-white shadow-xl rounded-xl border border-gray-200 py-2 backdrop-blur-xl">
                           <button
                             onClick={() => {
                               setSessionToEdit(session.id)
@@ -563,7 +565,7 @@ const ChatPage: React.FC = () => {
                               setIsEditTitleDialogOpen(true)
                               setActiveSessionForMenu(null)
                             }}
-                            className="w-full flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                            className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           >
                             <Edit3 className="w-4 h-4 mr-3" />
                             {t("chat.editTitle")}
@@ -574,7 +576,7 @@ const ChatPage: React.FC = () => {
                               setIsDeleteDialogOpen(true)
                               setActiveSessionForMenu(null)
                             }}
-                            className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                            className="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                           >
                             <Trash2 className="w-4 h-4 mr-3" />
                             {t("chat.deleteChat")}
@@ -599,21 +601,21 @@ const ChatPage: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-[90vh]">
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
+        <div className="lg:hidden flex items-center justify-between p-4 bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-slate-600 hover:text-slate-900 transition-colors p-2 -ml-2 rounded-lg hover:bg-slate-100"
+            className="text-gray-600 hover:text-gray-900 transition-colors p-2 -ml-2 rounded-lg hover:bg-gray-100"
           >
             <Menu className="w-5 h-5" />
           </button>
-          <h2 className="text-lg font-semibold text-slate-800 truncate max-w-[200px]">
+          <h2 className="text-lg font-semibold text-gray-800 truncate max-w-[200px]">
             {currentSession?.title || t("chat.newChat")}
           </h2>
           <button
             onClick={createNewSession}
-            className="text-slate-600 hover:text-slate-900 transition-colors p-2 -mr-2 rounded-lg hover:bg-slate-100"
+            className="text-gray-600 hover:text-gray-900 transition-colors p-2 -mr-2 rounded-lg hover:bg-gray-100"
           >
             <Plus className="w-5 h-5" />
           </button>
@@ -621,93 +623,102 @@ const ChatPage: React.FC = () => {
 
         {/* Chat Content */}
         {!currentSession ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-blue-50/30">
-            <div className="text-center max-w-md">
-              <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Sparkles className="w-10 h-10 text-white" />
-              </div>
-              <h2 className="text-3xl font-bold text-slate-800 mb-3">{t("chat.welcomeTitle")}</h2>
-              <p className="text-slate-600 mb-8 leading-relaxed">{t("chat.welcomeMessage")}</p>
+          <div className="flex-1 flex flex-col items-center justify-center p-8">
+            <div className="text-center max-w-2xl">
+              {/* <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                <Sparkles className="w-12 h-12 text-white" />
+              </div> */}
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">{t("chat.welcomeTitle")}</h2>
+              <p className="text-gray-600 mb-8 text-lg leading-relaxed">{t("chat.welcomeMessage")}</p>
               <button
                 onClick={createNewSession}
-                className="inline-flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 px-8 rounded-xl transition-all duration-200 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="inline-flex items-center gap-3  text-zinc-800 border border-zinc-800 py-4 px-8 rounded-xl transition-all duration-200 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-6 h-6" />
                 {t("chat.startNewChat")}
               </button>
             </div>
           </div>
         ) : (
           <>
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {currentSession.messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full">
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mb-4">
-                    <MessageSquare className="w-8 h-8 text-emerald-600" />
+            {/* Messages Area - Fixed height with proper overflow */}
+            <div className="flex-1 overflow-hidden flex flex-col">
+              <div className="flex-1 overflow-y-auto px-4 py-6">
+                {currentSession.messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full">
+                    {/* <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mb-4">
+                      <Bot className="w-8 h-8 text-emerald-600" />
+                    </div> */}
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">{t("chat.newChatTitle")}</h3>
+                    <p className="text-gray-600 text-center max-w-md leading-relaxed">{t("chat.newChatMessage")}</p>
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-800 mb-2">{t("chat.newChatTitle")}</h3>
-                  <p className="text-slate-600 text-center max-w-md">{t("chat.newChatMessage")}</p>
-                </div>
-              ) : (
-                <div className="max-w-4xl mx-auto space-y-6">
-                  {currentSession.messages.map((msg, index) => (
-                    <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                      <div
-                        className={`max-w-[85%] sm:max-w-[75%] ${
-                          msg.role === "user"
-                            ? "bg-gradient-to-r from-green-100 to-green-200 text-white rounded-2xl rounded-br-md"
-                            : "bg-white text-slate-800 rounded-2xl rounded-bl-md shadow-sm shadow-gray-400 border border-slate-200"
-                        } px-2 py-1 relative group`}
-                      >
-                        <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
-
-                        <div
-                          className={`flex items-center justify-between mt-3 text-xs ${
-                            msg.role === "user" ? "text-emerald-100" : "text-slate-500"
-                          }`}
-                        >
-                          <span>{formatTimestamp(msg.timestamp)}</span>
-
+                ) : (
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    {currentSession.messages.map((msg, index) => (
+                      <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                        <div className={`flex items-start space-x-3 max-w-[85%] sm:max-w-[75%]`}>
                           {msg.role === "assistant" && (
-                            <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button
-                                onClick={() => copyMessageToClipboard(msg.content)}
-                                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
-                                title={t("chat.copyResponse")}
-                              >
-                                <Copy className="w-3.5 h-3.5" />
-                              </button>
+                            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg flex-shrink-0 mt-1">
+                              <Bot className="w-4 h-4 text-white" />
+                            </div>
+                          )}
 
-                              {index === currentSession.messages.length - 1 && (
-                                <button
-                                  onClick={handleRegenerateResponse}
-                                  disabled={isLoading}
-                                  className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
-                                  title={t("chat.regenerateResponse")}
-                                >
-                                  <RotateCcw className="w-3.5 h-3.5" />
-                                </button>
-                              )}
+                          <div
+                            className={`${
+                              msg.role === "user"
+                                ? "bg-gray-100 text-gray-800 rounded-2xl rounded-br-md shadow-sm border border-gray-200"
+                                : "bg-white text-gray-800 rounded-2xl rounded-bl-md shadow-sm border border-gray-200"
+                            } px-5 py-3 relative group`}
+                          >
+                            <div className="whitespace-pre-wrap leading-relaxed text-sm">{msg.content}</div>
+
+                            {msg.role === "assistant" && (
+                              <div className="flex items-center justify-end mt-3">
+                                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={() => copyMessageToClipboard(msg.content)}
+                                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                                    title={t("chat.copyResponse")}
+                                  >
+                                    <Copy className="w-3.5 h-3.5 text-gray-500" />
+                                  </button>
+                                  {index === currentSession.messages.length - 1 && (
+                                    <button
+                                      onClick={handleRegenerateResponse}
+                                      disabled={isLoading}
+                                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                                      title={t("chat.regenerateResponse")}
+                                    >
+                                      <RotateCcw className="w-3.5 h-3.5 text-gray-500" />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {msg.role === "user" && (
+                            <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center shadow-lg flex-shrink-0 mt-1">
+                              <User className="w-4 h-4 text-white" />
                             </div>
                           )}
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Input Area */}
-            <div className="p-6 bg-white/80 backdrop-blur-xl border-t border-slate-200/60">
+            {/* Input Area - Fixed to bottom */}
+            <div className="border-t border-gray-200/50 bg-white/95 backdrop-blur-xl p-4 shadow-lg">
               <div className="max-w-4xl mx-auto">
-                <div className="flex items-end space-x-4">
+                <div className="flex items-end space-x-3">
                   <div className="flex-1">
                     <textarea
                       ref={inputRef}
-                      className="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 resize-none transition-all duration-200 bg-white/70 backdrop-blur-sm placeholder-slate-400"
+                      className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 text-zinc-800 resize-none transition-all duration-200 bg-white placeholder-gray-800 shadow-sm"
                       placeholder={t("chat.typeMessage")}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
@@ -717,16 +728,14 @@ const ChatPage: React.FC = () => {
                       style={{ minHeight: "52px", maxHeight: "120px" }}
                     />
                   </div>
-
                   <div className="flex items-center space-x-2">
                     <VoiceInput onResult={handleVoiceResult} disabled={isLoading} />
-
                     <button
                       onClick={handleSendMessage}
                       disabled={!message.trim() || isLoading}
                       className={`flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
                         !message.trim() || isLoading
-                          ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                           : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                       }`}
                     >
@@ -754,15 +763,14 @@ const ChatPage: React.FC = () => {
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-slate-800">{t("chat.confirmDelete")}</h3>
-                <p className="text-sm text-slate-600 mt-1">{t("chat.deleteWarning")}</p>
+                <h3 className="text-lg font-semibold text-gray-800">{t("chat.confirmDelete")}</h3>
+                <p className="text-sm text-gray-600 mt-1">{t("chat.deleteWarning")}</p>
               </div>
             </div>
-
             <div className="flex space-x-3 mt-6">
               <button
                 onClick={() => setIsDeleteDialogOpen(false)}
-                className="flex-1 py-2.5 px-4 border-2 border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors font-medium"
+                className="flex-1 py-2.5 px-4 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
               >
                 {t("common.cancel")}
               </button>
@@ -786,22 +794,20 @@ const ChatPage: React.FC = () => {
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mr-4">
                 <Edit3 className="w-6 h-6 text-emerald-600" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-800">{t("chat.editTitle")}</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("chat.editTitle")}</h3>
             </div>
-
             <input
               type="text"
-              className="w-full border-2 border-slate-200 rounded-xl py-3 px-4 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition-all"
+              className="w-full border-2 border-gray-200 rounded-xl py-3 px-4 focus:outline-none  transition-all"
               value={editedTitle}
               onChange={(e) => setEditedTitle(e.target.value)}
               placeholder={t("chat.enterTitle")}
               autoFocus
             />
-
             <div className="flex space-x-3 mt-6">
               <button
                 onClick={() => setIsEditTitleDialogOpen(false)}
-                className="flex-1 py-2.5 px-4 border-2 border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors font-medium"
+                className="flex-1 py-2.5 px-4 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
               >
                 {t("common.cancel")}
               </button>
