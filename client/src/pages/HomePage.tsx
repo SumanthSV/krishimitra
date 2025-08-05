@@ -1,27 +1,14 @@
 import React from 'react';
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Grid, 
-  Card, 
-  CardContent, 
-  CardMedia, 
-  Button, 
-  Paper,
-  useTheme,
-  useMediaQuery
-} from '@mui/material';
-import { 
-  WbSunny as WeatherIcon,
-  Grass as CropIcon,
-  AccountBalance as FinanceIcon,
-  QuestionAnswer as QueryIcon,
-  ArrowForward as ArrowIcon
-} from '@mui/icons-material';
-import { Link as RouterLink } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useLocation } from '../contexts/LocationContext';
+import { Link } from 'react-router-dom';
+// import {  Grass, AccountBalance, QuestionAnswer, ArrowForward } from '@mui/icons-material';
+import { useLanguage } from '../contexts/LanguageContext.tsx';
+import { useLocation } from '../contexts/LocationContext.tsx';
+import {
+  Sprout,
+  Banknote,
+  ArrowRight,
+  Cloud
+} from 'lucide-react';
 
 const translations = {
   en: {
@@ -56,18 +43,13 @@ const translations = {
     basedOnLocation: 'आपके स्थान के आधार पर:',
     setLocation: 'स्थान सेट करें',
   },
-  // Add more languages as needed
 };
 
-const HomePage: React.FC = () => {
+const HomePage = () => {
   const { language } = useLanguage();
   const { locationData } = useLocation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
-  const t = translations[language as keyof typeof translations] || translations.en;
+  const t = translations[language] || translations.en;
 
-  // Sample weather data (in a real app, this would come from an API)
   const weatherData = {
     temperature: '32°C',
     condition: 'Sunny',
@@ -76,214 +58,144 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <div className="max-w-7xl  mx-auto px-4 py-10 space-y-10 text-gray-800">
+
       {/* Hero Section */}
-      <Paper 
-        elevation={3} 
-        sx={{ 
-          p: 4, 
-          mb: 4, 
-          background: 'linear-gradient(45deg, #4caf50 30%, #81c784 90%)',
-          color: 'white',
-          borderRadius: 2
-        }}
-      >
-        <Grid container spacing={3} alignItems="center">
-          <Grid item xs={12} md={8}>
-            <Typography variant="h3" component="h1" gutterBottom>
-              {t.welcome}
-            </Typography>
-            <Typography variant="h5" paragraph>
-              {t.tagline}
-            </Typography>
-            <Button 
-              variant="contained" 
-              color="secondary" 
-              size="large"
-              component={RouterLink}
-              to="/query"
-              startIcon={<QueryIcon />}
-              sx={{ mt: 2 }}
+      <section className="bg-gradient-to-r from-green-600 via-green-800 to-black text-white rounded-2xl shadow-lg p-10">
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold leading-tight">{t.welcome}</h1>
+            <p className="text-lg mt-2 opacity-90">{t.tagline}</p>
+            <Link
+              to="/chat"
+              className="mt-4 inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-zinc-700 font-semibold py-2 px-5 rounded-md transition duration-200"
             >
+              <Sprout size={20} />
               {t.askQuestion}
-            </Button>
-          </Grid>
-          <Grid item xs={12} md={4} sx={{ display: { xs: 'none', md: 'block' } }}>
-            <Box 
-              component="img"
-              src="/logo.svg"
-              alt="KrishiMitra Logo"
-              sx={{ width: '100%', maxWidth: 200, mx: 'auto', display: 'block' }}
-            />
-          </Grid>
-        </Grid>
-      </Paper>
+            </Link>
+          </div>
+          <div className="w-40 hidden md:block">
+            <img src="/logo.svg" alt="KrishiMitra Logo" className="w-full drop-shadow-xl" />
+          </div>
+        </div>
+      </section>
 
-      {/* Location-based Advice */}
-      <Paper elevation={2} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
-        <Typography variant="h5" gutterBottom>
-          {t.localizedAdvice}
-        </Typography>
-        
-        {locationData.district && locationData.state ? (
-          <Typography variant="body1">
-            {t.basedOnLocation} {locationData.district}, {locationData.state}
-          </Typography>
-        ) : locationData.coordinates ? (
-          <Typography variant="body1">
-            {t.basedOnLocation} {locationData.coordinates.latitude.toFixed(2)}, {locationData.coordinates.longitude.toFixed(2)}
-          </Typography>
-        ) : (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="body1">
-              {locationData.isLoading ? 'Detecting location...' : 'Location not set'}
-            </Typography>
-            <Button 
-              variant="outlined" 
-              size="small"
-              component={RouterLink}
-              to="/settings"
-            >
-              {t.setLocation}
-            </Button>
-          </Box>
+      {/* Location Based Advice */}
+      <section className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+        <h2 className="text-2xl font-semibold text-gray-900">{t.localizedAdvice}</h2>
+        <div className="text-gray-700 text-sm">
+          {locationData.district && locationData.state ? (
+            <p>{t.basedOnLocation} <strong>{locationData.district}, {locationData.state}</strong></p>
+          ) : locationData.coordinates ? (
+            <p>{t.basedOnLocation} <strong>{locationData.coordinates.latitude.toFixed(2)}, {locationData.coordinates.longitude.toFixed(2)}</strong></p>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span>
+                {locationData.isLoading ? 'Detecting location...' : 'Location not set'}
+              </span>
+              <Link
+                to="/settings"
+                className="border border-gray-400 text-sm px-3 py-1 rounded hover:bg-gray-100"
+              >
+                {t.setLocation}
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {(locationData.district || locationData.coordinates) && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 text-center">
+            <div className="bg-gray-50 p-4 rounded shadow-sm">
+              <p className="text-xs text-gray-500">Temperature</p>
+              <p className="text-lg font-semibold">{weatherData.temperature}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded shadow-sm">
+              <p className="text-xs text-gray-500">Condition</p>
+              <p className="text-lg font-semibold">{weatherData.condition}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded shadow-sm">
+              <p className="text-xs text-gray-500">Humidity</p>
+              <p className="text-lg font-semibold">{weatherData.humidity}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded shadow-sm">
+              <p className="text-xs text-gray-500">Rainfall</p>
+              <p className="text-lg font-semibold">{weatherData.rainfall}</p>
+            </div>
+          </div>
         )}
+      </section>
 
-        {/* Weather Preview */}
-        {locationData.district || locationData.coordinates ? (
-          <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={6} sm={3}>
-                <Typography variant="subtitle2">Temperature</Typography>
-                <Typography variant="h6">{weatherData.temperature}</Typography>
-              </Grid>
-              <Grid item xs={6} sm={3}>
-                <Typography variant="subtitle2">Condition</Typography>
-                <Typography variant="h6">{weatherData.condition}</Typography>
-              </Grid>
-              <Grid item xs={6} sm={3}>
-                <Typography variant="subtitle2">Humidity</Typography>
-                <Typography variant="h6">{weatherData.humidity}</Typography>
-              </Grid>
-              <Grid item xs={6} sm={3}>
-                <Typography variant="subtitle2">Rainfall</Typography>
-                <Typography variant="h6">{weatherData.rainfall}</Typography>
-              </Grid>
-            </Grid>
-          </Box>
-        ) : null}
-      </Paper>
+      {/* Recent Updates */}
+      <section>
+        <h2 className="text-3xl font-bold mb-6">{t.recentUpdates}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Weather Card */}
+          <UpdateCard
+            icon={<Cloud className="text-yellow-500" size={40} />}
+            bg="bg-yellow-50"
+            title={t.weatherTitle}
+            desc={t.weatherDesc}
+            link="/weather"
+            label={t.viewMore}
+          />
 
-      {/* Feature Cards */}
-      <Typography variant="h4" component="h2" gutterBottom sx={{ mt: 6, mb: 3 }}>
-        {t.recentUpdates}
-      </Typography>
-      
-      <Grid container spacing={4}>
-        {/* Weather Card */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <CardMedia
-              sx={{ 
-                height: 140, 
-                bgcolor: theme.palette.primary.light,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <WeatherIcon sx={{ fontSize: 60, color: 'white' }} />
-            </CardMedia>
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Typography gutterBottom variant="h5" component="h2">
-                {t.weatherTitle}
-              </Typography>
-              <Typography>
-                {t.weatherDesc}
-              </Typography>
-            </CardContent>
-            <Box sx={{ p: 2, pt: 0 }}>
-              <Button 
-                endIcon={<ArrowIcon />} 
-                component={RouterLink} 
-                to="/weather"
-              >
-                {t.viewMore}
-              </Button>
-            </Box>
-          </Card>
-        </Grid>
+          {/* Crop Card */}
+          <UpdateCard
+            icon={<Sprout className="text-green-600" size={40} />}
+            bg="bg-green-50"
+            title={t.cropTitle}
+            desc={t.cropDesc}
+            link="/crops"
+            label={t.viewMore}
+          />
 
-        {/* Crop Card */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <CardMedia
-              sx={{ 
-                height: 140, 
-                bgcolor: theme.palette.secondary.light,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <CropIcon sx={{ fontSize: 60, color: 'white' }} />
-            </CardMedia>
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Typography gutterBottom variant="h5" component="h2">
-                {t.cropTitle}
-              </Typography>
-              <Typography>
-                {t.cropDesc}
-              </Typography>
-            </CardContent>
-            <Box sx={{ p: 2, pt: 0 }}>
-              <Button 
-                endIcon={<ArrowIcon />} 
-                component={RouterLink} 
-                to="/crops"
-              >
-                {t.viewMore}
-              </Button>
-            </Box>
-          </Card>
-        </Grid>
-
-        {/* Finance Card */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <CardMedia
-              sx={{ 
-                height: 140, 
-                bgcolor: theme.palette.info.light,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <FinanceIcon sx={{ fontSize: 60, color: 'white' }} />
-            </CardMedia>
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Typography gutterBottom variant="h5" component="h2">
-                {t.financeTitle}
-              </Typography>
-              <Typography>
-                {t.financeDesc}
-              </Typography>
-            </CardContent>
-            <Box sx={{ p: 2, pt: 0 }}>
-              <Button 
-                endIcon={<ArrowIcon />} 
-                component={RouterLink} 
-                to="/finance"
-              >
-                {t.viewMore}
-              </Button>
-            </Box>
-          </Card>
-        </Grid>
-      </Grid>
-    </Container>
+          {/* Finance Card */}
+          <UpdateCard
+            icon={<Banknote className="text-blue-600" size={40} />}
+            bg="bg-blue-50"
+            title={t.financeTitle}
+            desc={t.financeDesc}
+            link="/finance"
+            label={t.viewMore}
+          />
+        </div>
+      </section>
+    </div>
   );
 };
+
+function UpdateCard({ icon, bg, title, desc, link, label }) {
+  return (
+   <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden group border border-gray-100">
+      
+      {/* Icon Section */}
+      <div className={`flex justify-center items-center h-40 ${bg} transition-all`}>
+        <div className="text-5xl text-white">{icon}</div>
+      </div>
+      
+      {/* Content */}
+      <div className="p-6 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 group-hover:text-green-700 transition-colors">
+            {title}
+          </h3>
+          <p className="mt-2 text-gray-600 text-sm leading-relaxed">
+            {desc}
+          </p>
+        </div>
+        
+        {/* CTA Link */}
+        <div className="mt-4">
+          <Link
+            to={link}
+            className="text-green-700 hover:text-green-800 inline-flex items-center gap-1 text-sm font-medium"
+          >
+            {label} <ArrowRight size={16} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default HomePage;

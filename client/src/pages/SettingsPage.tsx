@@ -41,9 +41,9 @@ import {
   Download as DownloadIcon,
   Upload as UploadIcon
 } from '@mui/icons-material';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useLocation } from '../contexts/LocationContext';
-import { useOfflineData } from '../contexts/OfflineDataContext';
+import { useLanguage } from '../contexts/LanguageContext.tsx';
+import { useLocation } from '../contexts/LocationContext.tsx';
+import { useOfflineData } from '../contexts/OfflineDataContext.tsx';
 
 const translations = {
   en: {

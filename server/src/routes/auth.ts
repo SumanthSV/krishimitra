@@ -16,10 +16,30 @@ router.post('/register', [
   body('email').isEmail().withMessage('Valid email is required'),
   body('phone').matches(/^[6-9]\d{9}$/).withMessage('Valid Indian mobile number is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role').optional().isIn(['farmer', 'advisor', 'vendor']),
+  body('role').optional().isIn(['farmer', 'advisor', 'vendor', 'financier', 'agri_expert', 'government_officer']),
+  
+  // Common profile fields
+  body('profile.preferredLanguage').optional().isIn(['en', 'hi', 'pa', 'bn', 'te', 'ta', 'mr', 'gu', 'kn', 'ml']),
+  
+  // Farmer-specific fields
   body('profile.farmLocation.state').optional().isString(),
   body('profile.farmLocation.district').optional().isString(),
-  body('profile.preferredLanguage').optional().isIn(['en', 'hi', 'pa', 'bn', 'te', 'ta', 'mr', 'gu', 'kn', 'ml'])
+  body('profile.farmLocation.village').optional().isString(),
+  body('profile.farmSize').optional().isNumeric(),
+  body('profile.farmParcels').optional().isNumeric(),
+  body('profile.farmingType').optional().isIn(['crop', 'livestock', 'mixed', 'other']),
+  body('profile.hasIrrigation').optional().isBoolean(),
+  body('profile.hasSmartphone').optional().isBoolean(),
+  
+  // Financier-specific fields
+  body('profile.organizationName').optional().isString(),
+  body('profile.operationAreas').optional().isArray(),
+  body('profile.loanTypes').optional().isArray(),
+  
+  // Vendor-specific fields
+  body('profile.businessName').optional().isString(),
+  body('profile.productTypes').optional().isArray(),
+  body('profile.operatingLocations').optional().isArray()
 ], asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

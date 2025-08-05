@@ -1,6 +1,6 @@
 // Utilities for analytics and tracking
 
-import { getLanguage } from './languageUtils';
+import { getLanguage } from './languageUtils.ts';
 
 // Event categories
 export enum EventCategory {

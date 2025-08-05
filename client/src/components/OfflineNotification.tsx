@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Snackbar, Typography } from '@mui/material';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/LanguageContext.tsx';
 
 const translations = {
   en: {

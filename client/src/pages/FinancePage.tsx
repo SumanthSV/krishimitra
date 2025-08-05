@@ -1,55 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Typography,
-  Box,
-  Grid,
-  Paper,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Tabs,
-  Tab,
-  TextField,
-  InputAdornment,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  CircularProgress,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Slider,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  useTheme
-} from '@mui/material';
-import {
-  Search as SearchIcon,
-  ExpandMore as ExpandMoreIcon,
-  AccountBalance as BankIcon,
-  CreditCard as CreditIcon,
-  Security as InsuranceIcon,
-  Calculate as CalculateIcon,
-  Info as InfoIcon,
-  Phone as PhoneIcon,
-  Email as EmailIcon,
-  Language as WebsiteIcon,
-  Download as DownloadIcon
-} from '@mui/icons-material';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useOfflineData } from '../contexts/OfflineDataContext';
+import { useLanguage } from '../contexts/LanguageContext.tsx';
+import { useOfflineData } from '../contexts/OfflineDataContext.tsx';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -69,9 +20,9 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <div className="p-6">
           {children}
-        </Box>
+        </div>
       )}
     </div>
   );
@@ -354,7 +305,6 @@ const sampleFinanceData = {
 const FinancePage: React.FC = () => {
   const { language } = useLanguage();
   const { cachedData, updateFinanceData } = useOfflineData();
-  const theme = useTheme();
   
   const t = translations[language as keyof typeof translations] || translations.en;
   
@@ -373,7 +323,7 @@ const FinancePage: React.FC = () => {
   const [tenure, setTenure] = useState(5);
   const [emiResult, setEmiResult] = useState<any>(null);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (newValue: number) => {
     setTabValue(newValue);
   };
 
@@ -414,19 +364,19 @@ const FinancePage: React.FC = () => {
       setError(null);
       
       try {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Simulate API delay
+        // await new Promise(resolve => setTimeout(resolve, 1500));
         
-        if (navigator.onLine) {
-          setFinanceData(sampleFinanceData);
-          setIsOfflineData(false);
-          updateFinanceData(sampleFinanceData);
+        // Always set the data from the sample data first
+        // This ensures we always have data to display
+        setFinanceData(sampleFinanceData);
+        updateFinanceData(sampleFinanceData);
+        
+        // Check if we're offline and have cached data
+        if (!navigator.onLine && cachedData.financeData) {
+          setIsOfflineData(true);
         } else {
-          if (cachedData.financeData) {
-            setFinanceData(cachedData.financeData);
-            setIsOfflineData(true);
-          } else {
-            throw new Error('No internet connection and no cached data available');
-          }
+          setIsOfflineData(false);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -471,90 +421,118 @@ const FinancePage: React.FC = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, textAlign: 'center' }}>
-        <CircularProgress />
-        <Typography variant="h6" sx={{ mt: 2 }}>
+      <div className="container mx-auto px-4 py-8 text-center">
+        <div className="flex justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+        <h2 className="mt-4 text-lg font-medium text-gray-700">
           {t.loading}
-        </Typography>
-      </Container>
+        </h2>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="error">{t.error}: {error}</Alert>
-      </Container>
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">{t.error}:</strong>
+          <span className="block sm:inline"> {error}</span>
+        </div>
+      </div>
     );
   }
 
   const filteredData = getFilteredData();
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">
         {t.title}
-      </Typography>
+      </h1>
       
       {isOfflineData && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          {t.offline}
-        </Alert>
+        <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
+          <p>{t.offline}</p>
+        </div>
       )}
       
       {/* Search Bar */}
-      <Paper elevation={2} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder={t.search}
-          value={searchQuery}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Paper>
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+            placeholder={t.search}
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+        </div>
+      </div>
 
       {/* Tabs */}
-      <Paper elevation={3} sx={{ borderRadius: 2 }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange} 
-            aria-label="finance tabs"
-            variant="fullWidth"
-          >
-            <Tab 
-              label={t.loans} 
-              icon={<CreditIcon />} 
-              iconPosition="start"
-              {...a11yProps(0)} 
-            />
-            <Tab 
-              label={t.schemes} 
-              icon={<BankIcon />} 
-              iconPosition="start"
-              {...a11yProps(1)} 
-            />
-            <Tab 
-              label={t.insurance} 
-              icon={<InsuranceIcon />} 
-              iconPosition="start"
-              {...a11yProps(2)} 
-            />
-            <Tab 
-              label={t.calculator} 
-              icon={<CalculateIcon />} 
-              iconPosition="start"
-              {...a11yProps(3)} 
-            />
-          </Tabs>
-        </Box>
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex" aria-label="Tabs">
+            <button
+              onClick={() => handleTabChange(0)}
+              className={`w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm ${tabValue === 0 ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              aria-current={tabValue === 0 ? 'page' : undefined}
+              {...a11yProps(0)}
+            >
+              <div className="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                {t.loans}
+              </div>
+            </button>
+            <button
+              onClick={() => handleTabChange(1)}
+              className={`w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm ${tabValue === 1 ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              aria-current={tabValue === 1 ? 'page' : undefined}
+              {...a11yProps(1)}
+            >
+              <div className="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                {t.schemes}
+              </div>
+            </button>
+            <button
+              onClick={() => handleTabChange(2)}
+              className={`w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm ${tabValue === 2 ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              aria-current={tabValue === 2 ? 'page' : undefined}
+              {...a11yProps(2)}
+            >
+              <div className="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                {t.insurance}
+              </div>
+            </button>
+            <button
+              onClick={() => handleTabChange(3)}
+              className={`w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm ${tabValue === 3 ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              aria-current={tabValue === 3 ? 'page' : undefined}
+              {...a11yProps(3)}
+            >
+              <div className="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                {t.calculator}
+              </div>
+            </button>
+          </nav>
+        </div>
         
         {/* Loans Tab */}
         <TabPanel value={tabValue} index={0}>
@@ -573,384 +551,331 @@ const FinancePage: React.FC = () => {
         
         {/* Calculator Tab */}
         <TabPanel value={tabValue} index={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {t.calculator}
-                  </Typography>
-                  
-                  <Box sx={{ mb: 3 }}>
-                    <Typography gutterBottom>
-                      {t.loanAmount}: ₹{loanAmount.toLocaleString()}
-                    </Typography>
-                    <Slider
-                      value={loanAmount}
-                      onChange={(_, value) => setLoanAmount(value as number)}
-                      min={10000}
-                      max={2000000}
-                      step={10000}
-                      valueLabelDisplay="auto"
-                      valueLabelFormat={(value) => `₹${value.toLocaleString()}`}
-                    />
-                  </Box>
-                  
-                  <Box sx={{ mb: 3 }}>
-                    <Typography gutterBottom>
-                      {t.interestRate}: {interestRate}%
-                    </Typography>
-                    <Slider
-                      value={interestRate}
-                      onChange={(_, value) => setInterestRate(value as number)}
-                      min={5}
-                      max={20}
-                      step={0.5}
-                      valueLabelDisplay="auto"
-                      valueLabelFormat={(value) => `${value}%`}
-                    />
-                  </Box>
-                  
-                  <Box sx={{ mb: 3 }}>
-                    <Typography gutterBottom>
-                      {t.tenure}: {tenure} {t.years}
-                    </Typography>
-                    <Slider
-                      value={tenure}
-                      onChange={(_, value) => setTenure(value as number)}
-                      min={1}
-                      max={30}
-                      step={1}
-                      valueLabelDisplay="auto"
-                      valueLabelFormat={(value) => `${value} years`}
-                    />
-                  </Box>
-                  
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={calculateEMI}
-                    sx={{ mt: 2 }}
-                  >
-                    {t.calculate}
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  {t.calculator}
+                </h3>
+                
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.loanAmount}: ₹{loanAmount.toLocaleString()}
+                  </label>
+                  <input
+                    type="range"
+                    min="10000"
+                    max="2000000"
+                    step="10000"
+                    value={loanAmount}
+                    onChange={(e) => setLoanAmount(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+                
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.interestRate}: {interestRate}%
+                  </label>
+                  <input
+                    type="range"
+                    min="5"
+                    max="20"
+                    step="0.5"
+                    value={interestRate}
+                    onChange={(e) => setInterestRate(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+                
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.tenure}: {tenure} {t.years}
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="30"
+                    step="1"
+                    value={tenure}
+                    onChange={(e) => setTenure(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+                
+                <button
+                  onClick={calculateEMI}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  {t.calculate}
+                </button>
+              </div>
+            </div>
             
-            <Grid item xs={12} md={6}>
+            <div>
               {emiResult && (
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                  <div className="p-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">
                       Calculation Results
-                    </Typography>
+                    </h3>
                     
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle1" color="primary">
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-green-600">
                         {t.monthlyEMI}
-                      </Typography>
-                      <Typography variant="h4">
+                      </h4>
+                      <p className="text-2xl font-bold">
                         ₹{emiResult.emi.toLocaleString()}
-                      </Typography>
-                    </Box>
+                      </p>
+                    </div>
                     
-                    <Divider sx={{ my: 2 }} />
+                    <hr className="my-4" />
                     
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-500">
                           {t.principal}
-                        </Typography>
-                        <Typography variant="h6">
+                        </h4>
+                        <p className="text-lg font-semibold">
                           ₹{loanAmount.toLocaleString()}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-500">
                           {t.totalInterest}
-                        </Typography>
-                        <Typography variant="h6">
+                        </h4>
+                        <p className="text-lg font-semibold">
                           ₹{emiResult.totalInterest.toLocaleString()}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography variant="body2" color="text.secondary">
+                        </p>
+                      </div>
+                      <div className="col-span-2">
+                        <h4 className="text-sm font-medium text-gray-500">
                           {t.totalPayment}
-                        </Typography>
-                        <Typography variant="h6">
+                        </h4>
+                        <p className="text-lg font-semibold">
                           ₹{emiResult.totalPayment.toLocaleString()}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
-            </Grid>
-          </Grid>
+            </div>
+          </div>
         </TabPanel>
-      </Paper>
+      </div>
 
       {/* Details Dialog */}
-      <Dialog 
-        open={detailsOpen} 
-        onClose={handleDetailsClose}
-        maxWidth="md"
-        fullWidth
-      >
-        {selectedItem && (
-          <>
-            <DialogTitle>
-              {language === 'hi' && selectedItem.nameHi ? selectedItem.nameHi : selectedItem.name}
-            </DialogTitle>
-            <DialogContent>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t.provider}
-                  </Typography>
-                  <Typography variant="body1" paragraph>
-                    {selectedItem.provider}
-                  </Typography>
-                </Grid>
-                
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t.type}
-                  </Typography>
-                  <Typography variant="body1" paragraph>
-                    {selectedItem.type}
-                  </Typography>
-                </Grid>
-                
-                {selectedItem.interestRate && (
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t.interestRate}
-                    </Typography>
-                    <Typography variant="body1" paragraph>
-                      {selectedItem.interestRate}
-                    </Typography>
-                  </Grid>
-                )}
-                
-                {selectedItem.maxAmount && (
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t.loanAmount}
-                    </Typography>
-                    <Typography variant="body1" paragraph>
-                      {selectedItem.maxAmount}
-                    </Typography>
-                  </Grid>
-                )}
-                
-                {selectedItem.tenure && (
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t.tenure}
-                    </Typography>
-                    <Typography variant="body1" paragraph>
-                      {selectedItem.tenure}
-                    </Typography>
-                  </Grid>
-                )}
-                
-                {selectedItem.premium && (
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t.premium}
-                    </Typography>
-                    <Typography variant="body1" paragraph>
-                      {selectedItem.premium}
-                    </Typography>
-                  </Grid>
-                )}
-                
-                {selectedItem.eligibility && (
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t.eligibility}
-                    </Typography>
-                    <List dense>
-                      {selectedItem.eligibility.map((item: string, index: number) => (
-                        <ListItem key={index}>
-                          <ListItemIcon>
-                            <InfoIcon fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText primary={item} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Grid>
-                )}
-                
-                {selectedItem.benefits && (
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t.benefits}
-                    </Typography>
-                    <List dense>
-                      {selectedItem.benefits.map((benefit: string, index: number) => (
-                        <ListItem key={index}>
-                          <ListItemIcon>
-                            <InfoIcon fontSize="small" color="primary" />
-                          </ListItemIcon>
-                          <ListItemText primary={benefit} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Grid>
-                )}
-                
-                {selectedItem.coverage && (
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t.coverage}
-                    </Typography>
-                    <List dense>
-                      {selectedItem.coverage.map((item: string, index: number) => (
-                        <ListItem key={index}>
-                          <ListItemIcon>
-                            <InfoIcon fontSize="small" color="primary" />
-                          </ListItemIcon>
-                          <ListItemText primary={item} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Grid>
-                )}
-                
-                {selectedItem.contactInfo && (
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t.contactInfo}
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <PhoneIcon sx={{ mr: 1, fontSize: 'small' }} />
-                        <Typography variant="body2">
-                          {selectedItem.contactInfo.phone}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <EmailIcon sx={{ mr: 1, fontSize: 'small' }} />
-                        <Typography variant="body2">
-                          {selectedItem.contactInfo.email}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <WebsiteIcon sx={{ mr: 1, fontSize: 'small' }} />
-                        <Typography variant="body2">
-                          {selectedItem.contactInfo.website}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                )}
-              </Grid>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleDetailsClose}>
-                Close
-              </Button>
-              <Button variant="contained" color="primary">
-                {t.applyNow}
-              </Button>
-            </DialogActions>
-          </>
-        )}
-      </Dialog>
-    </Container>
+      {detailsOpen && selectedItem && (
+        <div className="fixed inset-0 z-10 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={handleDetailsClose}></div>
+
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                      {language === 'hi' && selectedItem.nameHi ? selectedItem.nameHi : selectedItem.name}
+                    </h3>
+                    <div className="mt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">{t.provider}</h4>
+                          <p className="mt-1">{selectedItem.provider}</p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500">{t.type}</h4>
+                          <p className="mt-1">{selectedItem.type}</p>
+                        </div>
+                        
+                        {selectedItem.interestRate && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-500">{t.interestRate}</h4>
+                            <p className="mt-1">{selectedItem.interestRate}</p>
+                          </div>
+                        )}
+                        
+                        {selectedItem.maxAmount && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-500">{t.loanAmount}</h4>
+                            <p className="mt-1">{selectedItem.maxAmount}</p>
+                          </div>
+                        )}
+                        
+                        {selectedItem.tenure && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-500">{t.tenure}</h4>
+                            <p className="mt-1">{selectedItem.tenure}</p>
+                          </div>
+                        )}
+                        
+                        {selectedItem.premium && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-500">{t.premium}</h4>
+                            <p className="mt-1">{selectedItem.premium}</p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {selectedItem.eligibility && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium text-gray-500 mb-2">{t.eligibility}</h4>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {selectedItem.eligibility.map((item: string, index: number) => (
+                              <li key={index} className="text-sm">{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {selectedItem.benefits && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium text-gray-500 mb-2">{t.benefits}</h4>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {selectedItem.benefits.map((benefit: string, index: number) => (
+                              <li key={index} className="text-sm">{benefit}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {selectedItem.coverage && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium text-gray-500 mb-2">{t.coverage}</h4>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {selectedItem.coverage.map((item: string, index: number) => (
+                              <li key={index} className="text-sm">{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {selectedItem.contactInfo && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium text-gray-500 mb-2">{t.contactInfo}</h4>
+                          <div className="space-y-2">
+                            <div className="flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                              </svg>
+                              <span className="text-sm">{selectedItem.contactInfo.phone}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                              <span className="text-sm">{selectedItem.contactInfo.email}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                              </svg>
+                              <span className="text-sm">{selectedItem.contactInfo.website}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button 
+                  type="button" 
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  {t.applyNow}
+                </button>
+                <button 
+                  type="button" 
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={handleDetailsClose}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 
   function renderFinanceItems(items: any[], type: string) {
     if (items.length === 0) {
       return (
-        <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="body1">{t.noResults}</Typography>
-        </Box>
+        <div className="p-6 text-center">
+          <p className="text-gray-500">{t.noResults}</p>
+        </div>
       );
     }
 
     return (
-      <Grid container spacing={3}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
-          <Grid item xs={12} md={6} lg={4} key={item.id}>
-            <Card 
-              sx={{ 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                '&:hover': { 
-                  boxShadow: theme.shadows[8],
-                  transform: 'translateY(-2px)',
-                  transition: 'all 0.3s ease-in-out'
-                },
-              }}
-            >
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" component="div" gutterBottom>
-                  {language === 'hi' && item.nameHi ? item.nameHi : item.name}
-                </Typography>
-                
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  {item.provider}
-                </Typography>
-                
-                <Chip 
-                  label={item.type} 
-                  size="small" 
-                  color="primary" 
-                  variant="outlined"
-                  sx={{ mb: 2 }}
-                />
-                
-                {item.interestRate && (
-                  <Typography variant="body2" paragraph>
-                    <strong>{t.interestRate}:</strong> {item.interestRate}
-                  </Typography>
-                )}
-                
-                {item.maxAmount && (
-                  <Typography variant="body2" paragraph>
-                    <strong>Max Amount:</strong> {item.maxAmount}
-                  </Typography>
-                )}
-                
-                {item.premium && (
-                  <Typography variant="body2" paragraph>
-                    <strong>{t.premium}:</strong> {item.premium}
-                  </Typography>
-                )}
-                
-                {item.benefits && item.benefits.length > 0 && (
-                  <Typography variant="body2" paragraph>
-                    <strong>{t.benefits}:</strong> {item.benefits[0]}
-                    {item.benefits.length > 1 && '...'}
-                  </Typography>
-                )}
-              </CardContent>
+          <div 
+            key={item.id} 
+            className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300 flex flex-col h-full"
+          >
+            <div className="p-6 flex-grow">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {language === 'hi' && item.nameHi ? item.nameHi : item.name}
+              </h3>
               
-              <CardActions>
-                <Button 
-                  size="small" 
-                  onClick={() => handleItemSelect(item)}
-                >
-                  {t.viewDetails}
-                </Button>
-                <Button 
-                  size="small" 
-                  variant="contained"
-                  color="primary"
-                >
-                  {t.applyNow}
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
+              <p className="text-sm text-gray-500 mb-2">
+                {item.provider}
+              </p>
+              
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-4">
+                {item.type}
+              </span>
+              
+              {item.interestRate && (
+                <p className="text-sm mb-2">
+                  <span className="font-medium">{t.interestRate}:</span> {item.interestRate}
+                </p>
+              )}
+              
+              {item.maxAmount && (
+                <p className="text-sm mb-2">
+                  <span className="font-medium">Max Amount:</span> {item.maxAmount}
+                </p>
+              )}
+              
+              {item.premium && (
+                <p className="text-sm mb-2">
+                  <span className="font-medium">{t.premium}:</span> {item.premium}
+                </p>
+              )}
+              
+              {item.benefits && item.benefits.length > 0 && (
+                <p className="text-sm mb-2">
+                  <span className="font-medium">{t.benefits}:</span> {item.benefits[0]}
+                  {item.benefits.length > 1 && '...'}
+                </p>
+              )}
+            </div>
+            
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between">
+              <button 
+                onClick={() => handleItemSelect(item)}
+                className="text-green-600 hover:text-green-800 text-sm font-medium"
+              >
+                {t.viewDetails}
+              </button>
+              <button 
+                className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-150 ease-in-out"
+              >
+                {t.applyNow}
+              </button>
+            </div>
+          </div>
         ))}
-      </Grid>
+      </div>
     );
   }
 };

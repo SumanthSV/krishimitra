@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "home": "ਹੋਮ",
+    "askQuery": "ਪ੍ਰਸ਼ਨ ਪੁੱਛੋ",
+    "weather": "ਮੌਸਮ",
+    "cropInfo": "ਫਸਲ ਜਾਣਕਾਰੀ",
+    "finance": "ਵਿੱਤ",
+    "settings": "ਸੈਟਿੰਗਾਂ",
+    "login": "ਲੌਗਇਨ",
+    "register": "ਰਜਿਸਟਰ",
+    "profile": "ਪ੍ਰੋਫਾਈਲ",
+    "logout": "ਲੌਗਆਊਟ"
+  }
+}

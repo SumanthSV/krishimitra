@@ -1,4 +1,4 @@
-import { getLanguage } from '../utils/languageUtils';
+import { getLanguage } from '../utils/languageUtils.ts';
 
 export interface VoiceRecognitionResult {
   transcript: string;

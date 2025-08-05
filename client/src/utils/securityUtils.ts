@@ -1,7 +1,7 @@
 // Utilities for security features
 
-import { logError, ErrorCategory, ErrorSeverity } from './errorUtils';
-import { trackEvent, EventCategory, EventAction } from './analyticsUtils';
+import { logError, ErrorCategory, ErrorSeverity } from './errorUtils.ts';
+import { trackEvent, EventCategory, EventAction } from './analyticsUtils.ts';
 
 // Local storage keys
 const AUTH_TOKEN_STORAGE_KEY = 'krishimitra_auth_token';

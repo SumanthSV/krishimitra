@@ -6,9 +6,18 @@ export interface IUser extends Document {
   email: string;
   phone: string;
   password: string;
-  role: 'farmer' | 'advisor' | 'vendor' | 'admin';
+  role: 'farmer' | 'advisor' | 'vendor' | 'financier' | 'agri_expert' | 'government_officer' | 'admin';
   profile: {
+    // Common fields
+    preferredLanguage: string;
+    avatar?: string;
+    
+    // Farmer-specific fields
     farmSize?: number;
+    farmParcels?: number;
+    farmingType?: 'crop' | 'livestock' | 'mixed' | 'other';
+    hasIrrigation?: boolean;
+    hasSmartphone?: boolean;
     farmLocation?: {
       state: string;
       district: string;
@@ -20,8 +29,16 @@ export interface IUser extends Document {
     };
     crops?: string[];
     experience?: number;
-    preferredLanguage: string;
-    avatar?: string;
+    
+    // Financier-specific fields
+    organizationName?: string;
+    operationAreas?: string[];
+    loanTypes?: string[];
+    
+    // Vendor-specific fields
+    businessName?: string;
+    productTypes?: string[];
+    operatingLocations?: string[];
   };
   preferences: {
     notifications: {
@@ -78,14 +95,33 @@ const userSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ['farmer', 'advisor', 'vendor', 'admin'],
+    enum: ['farmer', 'advisor', 'vendor', 'financier', 'agri_expert', 'government_officer', 'admin'],
     default: 'farmer'
   },
   profile: {
+    // Common fields
+    preferredLanguage: {
+      type: String,
+      default: 'en',
+      enum: ['en', 'hi', 'pa', 'bn', 'te', 'ta', 'mr', 'gu', 'kn', 'ml']
+    },
+    avatar: String,
+    
+    // Farmer-specific fields
     farmSize: {
       type: Number,
       min: 0
     },
+    farmParcels: {
+      type: Number,
+      min: 1
+    },
+    farmingType: {
+      type: String,
+      enum: ['crop', 'livestock', 'mixed', 'other']
+    },
+    hasIrrigation: Boolean,
+    hasSmartphone: Boolean,
     farmLocation: {
       state: String,
       district: String,
@@ -109,12 +145,16 @@ const userSchema = new Schema<IUser>({
       min: 0,
       max: 100
     },
-    preferredLanguage: {
-      type: String,
-      default: 'en',
-      enum: ['en', 'hi', 'pa', 'bn', 'te', 'ta', 'mr', 'gu', 'kn', 'ml']
-    },
-    avatar: String
+    
+    // Financier-specific fields
+    organizationName: String,
+    operationAreas: [String],
+    loanTypes: [String],
+    
+    // Vendor-specific fields
+    businessName: String,
+    productTypes: [String],
+    operatingLocations: [String]
   },
   preferences: {
     notifications: {

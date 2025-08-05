@@ -18,8 +18,8 @@ import {
   VolumeUp as VolumeUpIcon,
   VolumeOff as VolumeOffIcon
 } from '@mui/icons-material';
-import { getVoiceService, VoiceRecognitionResult } from '../services/VoiceService';
-import { useLanguage } from '../contexts/LanguageContext';
+import { getVoiceService, VoiceRecognitionResult } from '../services/VoiceService.ts';
+import { useLanguage } from '../contexts/LanguageContext.tsx';
 
 interface VoiceInputProps {
   onResult: (transcript: string, confidence: number) => void;

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import i18n from 'i18next';
 
 type LanguageContextType = {
   language: string;
@@ -18,7 +19,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     return savedLanguage || 'en';
   });
 
-  // Update localStorage when language changes
+  // Update localStorage and i18n when language changes
   useEffect(() => {
     localStorage.setItem('language', language);
     document.documentElement.lang = language;
@@ -26,6 +27,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     // Set text direction based on language
     const rtlLanguages = ['ur', 'ar']; // Urdu, Arabic
     document.documentElement.dir = rtlLanguages.includes(language) ? 'rtl' : 'ltr';
+    
+    // Update i18n language
+    if (i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
   }, [language]);
 
   const setLanguage = (newLanguage: string) => {

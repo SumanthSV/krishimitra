@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "home": "होम",
+    "askQuery": "प्रश्न विचारा",
+    "weather": "हवामान",
+    "cropInfo": "पीक माहिती",
+    "finance": "वित्त",
+    "settings": "सेटिंग्ज",
+    "login": "लॉगिन",
+    "register": "नोंदणी",
+    "profile": "प्रोफाइल",
+    "logout": "लॉगआउट"
+  }
+}

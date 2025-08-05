@@ -30,12 +30,18 @@
   "author": "KrishiMitra Team",
   "license": "MIT",
   "devDependencies": {
+    "autoprefixer": "^10.4.21",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
-    "prettier": "^3.2.5"
+    "postcss": "^8.5.6",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^4.1.11"
   },
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^0.536.0"
   }
 }

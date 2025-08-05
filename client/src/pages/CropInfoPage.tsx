@@ -7,7 +7,6 @@ import {
   Paper,
   Card,
   CardContent,
-  CardMedia,
   TextField,
   InputAdornment,
   Tabs,
@@ -35,8 +34,8 @@ import {
   BugReport as PestIcon,
   LocalOffer as PriceIcon
 } from '@mui/icons-material';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useOfflineData } from '../contexts/OfflineDataContext';
+import { useLanguage } from '../contexts/LanguageContext.tsx';
+import { useOfflineData } from '../contexts/OfflineDataContext.tsx';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -356,23 +355,20 @@ const CropInfoPage: React.FC = () => {
       try {
         // In a real app, we would fetch from an API here
         // For now, we'll use the sample data after a short delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // Check if we're online
-        if (navigator.onLine) {
-          setCropData(sampleCropData);
-          setIsOfflineData(false);
-          
-          // Cache the data for offline use
-          updateCropData(sampleCropData);
+        // Always set the data from the sample data first
+        // This ensures we always have data to display
+        setCropData(sampleCropData);
+        
+        // Cache the data for offline use
+        updateCropData(sampleCropData);
+        
+        // Check if we're offline and have cached data
+        if (!navigator.onLine && cachedData.cropData) {
+          setIsOfflineData(true);
         } else {
-          // Use cached data if available
-          if (cachedData.cropData) {
-            setCropData(cachedData.cropData);
-            setIsOfflineData(true);
-          } else {
-            throw new Error('No internet connection and no cached data available');
-          }
+          setIsOfflineData(false);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -412,262 +408,173 @@ const CropInfoPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, textAlign: 'center' }}>
-        <CircularProgress />
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          {t.loading}
-        </Typography>
-      </Container>
+        <div className="max-w-screen-lg mx-auto mt-4 mb-4 text-center">
+      <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-green-500 border-t-transparent"></div>
+      <h2 className="mt-2 text-lg font-medium text-gray-700">Loading...</h2>
+    </div>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Alert severity="error">{t.error}: {error}</Alert>
-      </Container>
+       <div className="max-w-screen-lg mx-auto mt-4 mb-4">
+  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+    <strong className="font-bold">{t.error}:</strong>
+    <span className="block sm:inline ml-1">{error}</span>
+  </div>
+</div>
     );
   }
 
   const filteredCrops = getFilteredCrops();
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        {t.title}
-      </Typography>
-      
-      {isOfflineData && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          {t.offline}
-        </Alert>
-      )}
-      
-      {/* Search Bar */}
-      <Paper elevation={2} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder={t.search}
-          value={searchQuery}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Paper>
+<div className="max-w-8xl bg-white-400 mx-auto px-4 py-8">
+  <h1 className="text-3xl font-bold mb-4">{t.title}</h1>
 
-      {/* Main Content */}
-      <Grid container spacing={3}>
-        {/* Crop List */}
-        <Grid item xs={12} md={selectedCrop ? 4 : 12}>
-          <Paper elevation={3} sx={{ borderRadius: 2 }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs 
-                value={tabValue} 
-                onChange={handleTabChange} 
-                aria-label="crop tabs"
-                variant="fullWidth"
+  {isOfflineData && (
+    <div className="bg-blue-100 border border-blue-300 text-blue-800 px-4 py-2 rounded mb-4">
+      {t.offline}
+    </div>
+  )}
+
+  {/* Search Bar */}
+  <div className="bg-white shadow p-4 rounded-xl mb-6">
+    <div className="flex items-center border rounded px-3 py-2">
+      <SearchIcon className="text-gray-500 mr-2" />
+      <input
+        type="text"
+        placeholder={t.search}
+        value={searchQuery}
+        onChange={handleSearchChange}
+        className="w-full outline-none bg-transparent"
+      />
+    </div>
+  </div>
+
+  {/* Grid Layout */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {/* Crop List */}
+    <div className={`${selectedCrop ? 'md:col-span-1' : 'md:col-span-3'} bg-white rounded-xl shadow`}>
+      <div className="border-b border-gray-200">
+        <div className="flex">
+          <button className={`flex-1 p-3 ${tabValue === 0 ? 'border-b-2 border-green-600 font-semibold' : ''}`} onClick={() => handleTabChange(null, 0)}>{t.all}</button>
+          <button className={`flex-1 p-3 ${tabValue === 1 ? 'border-b-2 border-green-600 font-semibold' : ''}`} onClick={() => handleTabChange(null, 1)}>{t.popular}</button>
+          <button className={`flex-1 p-3 ${tabValue === 2 ? 'border-b-2 border-green-600 font-semibold' : ''}`} onClick={() => handleTabChange(null, 2)}>{t.seasonal}</button>
+        </div>
+      </div>
+      <div className="p-4">
+        {tabValue === 0 && renderCropList(filteredCrops)}
+        {tabValue === 1 && renderCropList(filteredCrops)}
+        {tabValue === 2 && renderCropList(filteredCrops)}
+      </div>
+    </div>
+
+    {/* Crop Details */}
+    {selectedCrop && (
+      <div className="md:col-span-2 bg-white rounded-xl shadow overflow-hidden">
+        {/* Header */}
+        <div className="bg-green-600 text-white p-4 rounded-t-xl">
+          <h2 className="text-xl font-bold">
+            {language === 'hi' && selectedCrop.nameHi ? selectedCrop.nameHi : selectedCrop.name}
+          </h2>
+          <p className="text-sm">{selectedCrop.category}</p>
+        </div>
+
+        {/* Overview Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          {/* Attributes */}
+          <div className="space-y-4">
+            {[
+              { icon: <WaterIcon />, label: t.waterReq, value: selectedCrop.waterRequirement },
+              { icon: <SunIcon />, label: t.sunReq, value: selectedCrop.sunlightRequirement },
+              { icon: <CropIcon />, label: t.soilType, value: selectedCrop.soilType },
+              { icon: <SeedIcon />, label: t.growingSeason, value: selectedCrop.growingSeason },
+              { icon: <CropIcon />, label: t.harvestTime, value: selectedCrop.harvestTime },
+              { icon: <PriceIcon />, label: t.yield, value: selectedCrop.expectedYield },
+            ].map(({ icon, label, value }, idx) => (
+              <div className="flex items-center gap-2" key={idx}>
+                {icon}
+                <div>
+                  <p className="text-xs text-gray-500">{label}</p>
+                  <p className="text-sm font-medium">{value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Price Info */}
+          <div className="bg-gray-50 p-4 rounded">
+            <p className="text-lg font-semibold mb-2">{t.currentPrice}</p>
+            <p className="text-2xl text-green-600 font-bold">{selectedCrop.market.currentPrice}</p>
+            <p className="text-sm text-gray-600 mt-1">{t.priceRange}: {selectedCrop.market.priceRange}</p>
+            <div className="mt-4">
+              <p className="text-sm font-medium">{t.majorMarkets}:</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {selectedCrop.market.majorMarkets.map((market, index) => (
+                  <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{market}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs for Details */}
+        <div className="border-t border-gray-200 px-4">
+          <div className="flex">
+            {['cultivation', 'varieties', 'pests'].map((tab, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleCropDetailTabChange(null, idx)}
+                className={`flex-1 text-sm p-2 ${cropDetailTab === idx ? 'border-b-2 border-green-600 font-semibold' : ''}`}
               >
-                <Tab label={t.all} {...a11yProps(0)} />
-                <Tab label={t.popular} {...a11yProps(1)} />
-                <Tab label={t.seasonal} {...a11yProps(2)} />
-              </Tabs>
-            </Box>
-            
-            <TabPanel value={tabValue} index={0}>
-              {renderCropList(filteredCrops)}
-            </TabPanel>
-            <TabPanel value={tabValue} index={1}>
-              {renderCropList(filteredCrops)}
-            </TabPanel>
-            <TabPanel value={tabValue} index={2}>
-              {renderCropList(filteredCrops)}
-            </TabPanel>
-          </Paper>
-        </Grid>
-        
-        {/* Crop Details */}
-        {selectedCrop && (
-          <Grid item xs={12} md={8}>
-            <Paper elevation={3} sx={{ borderRadius: 2 }}>
-              {/* Crop Header */}
-              <Box sx={{ p: 3, bgcolor: theme.palette.primary.main, color: 'white', borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
-                <Typography variant="h5">
-                  {language === 'hi' && selectedCrop.nameHi ? selectedCrop.nameHi : selectedCrop.name}
-                </Typography>
-                <Typography variant="subtitle1">
-                  {selectedCrop.category}
-                </Typography>
-              </Box>
-              
-              {/* Crop Overview */}
-              <Grid container spacing={0}>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ p: 3 }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <WaterIcon color="primary" />
-                          <Box sx={{ ml: 1 }}>
-                            <Typography variant="caption">{t.waterReq}</Typography>
-                            <Typography variant="body2">{selectedCrop.waterRequirement}</Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <SunIcon color="primary" />
-                          <Box sx={{ ml: 1 }}>
-                            <Typography variant="caption">{t.sunReq}</Typography>
-                            <Typography variant="body2">{selectedCrop.sunlightRequirement}</Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <CropIcon color="primary" />
-                          <Box sx={{ ml: 1 }}>
-                            <Typography variant="caption">{t.soilType}</Typography>
-                            <Typography variant="body2">{selectedCrop.soilType}</Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <SeedIcon color="primary" />
-                          <Box sx={{ ml: 1 }}>
-                            <Typography variant="caption">{t.growingSeason}</Typography>
-                            <Typography variant="body2">{selectedCrop.growingSeason}</Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <CropIcon color="primary" />
-                          <Box sx={{ ml: 1 }}>
-                            <Typography variant="caption">{t.harvestTime}</Typography>
-                            <Typography variant="body2">{selectedCrop.harvestTime}</Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <PriceIcon color="primary" />
-                          <Box sx={{ ml: 1 }}>
-                            <Typography variant="caption">{t.yield}</Typography>
-                            <Typography variant="body2">{selectedCrop.expectedYield}</Typography>
-                          </Box>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <Typography variant="h6" gutterBottom>
-                      {t.currentPrice}
-                    </Typography>
-                    <Typography variant="h5" color="primary" gutterBottom>
-                      {selectedCrop.market.currentPrice}
-                    </Typography>
-                    <Typography variant="body2">
-                      {t.priceRange}: {selectedCrop.market.priceRange}
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="subtitle2">
-                        {t.majorMarkets}:
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                        {selectedCrop.market.majorMarkets.map((market: string, index: number) => (
-                          <Chip key={index} label={market} size="small" />
-                        ))}
-                      </Box>
-                    </Box>
-                  </Box>
-                </Grid>
-              </Grid>
-              
-              {/* Crop Detail Tabs */}
-              <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
-                <Tabs 
-                  value={cropDetailTab} 
-                  onChange={handleCropDetailTabChange} 
-                  aria-label="crop detail tabs"
-                  variant="scrollable"
-                  scrollButtons="auto"
-                >
-                  <Tab label={t.cultivation} {...a11yProps(0)} />
-                  <Tab label={t.varieties} {...a11yProps(1)} />
-                  <Tab label={t.pests} {...a11yProps(2)} />
-                </Tabs>
-              </Box>
-              
-              {/* Cultivation Practices */}
-              <TabPanel value={cropDetailTab} index={0}>
-                <List>
-                  {selectedCrop.cultivation.map((practice: string, index: number) => (
-                    <ListItem key={index}>
-                      <ListItemIcon>
-                        <CropIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText primary={practice} />
-                    </ListItem>
-                  ))}
-                </List>
-              </TabPanel>
-              
-              {/* Varieties */}
-              <TabPanel value={cropDetailTab} index={1}>
-                {selectedCrop.varieties.map((variety: any, index: number) => (
-                  <Accordion key={index} elevation={0}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography variant="subtitle1">{variety.name}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography variant="body2" paragraph>
-                        <strong>Characteristics:</strong> {variety.characteristics}
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Suitable Regions:</strong> {variety.suitableRegions}
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-              </TabPanel>
-              
-              {/* Pests & Diseases */}
-              <TabPanel value={cropDetailTab} index={2}>
-                {selectedCrop.pests.map((pest: any, index: number) => (
-                  <Accordion key={index} elevation={0}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography variant="subtitle1">
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <PestIcon sx={{ mr: 1, color: theme.palette.warning.main }} />
-                          {pest.name}
-                        </Box>
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography variant="body2" paragraph>
-                        <strong>Symptoms:</strong> {pest.symptoms}
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Control Measures:</strong> {pest.control}
-                      </Typography>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-              </TabPanel>
-            </Paper>
-          </Grid>
-        )}
-      </Grid>
-    </Container>
+                {t[tab]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-4">
+          {cropDetailTab === 0 && (
+            <ul className="space-y-2 list-disc list-inside">
+              {selectedCrop.cultivation.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          )}
+
+          {cropDetailTab === 1 && (
+            <div className="space-y-4">
+              {selectedCrop.varieties.map((variety, index) => (
+                <details key={index} className="border border-gray-200 rounded p-3">
+                  <summary className="font-semibold cursor-pointer">{variety.name}</summary>
+                  <p className="text-sm mt-2"><strong>Characteristics:</strong> {variety.characteristics}</p>
+                  <p className="text-sm"><strong>Suitable Regions:</strong> {variety.suitableRegions}</p>
+                </details>
+              ))}
+            </div>
+          )}
+
+          {cropDetailTab === 2 && (
+            <div className="space-y-4">
+              {selectedCrop.pests.map((pest, index) => (
+                <details key={index} className="border border-yellow-200 rounded p-3">
+                  <summary className="flex items-center text-yellow-700 font-semibold cursor-pointer">
+                    <PestIcon className="mr-2" /> {pest.name}
+                  </summary>
+                  <p className="text-sm mt-2"><strong>Symptoms:</strong> {pest.symptoms}</p>
+                  <p className="text-sm"><strong>Control Measures:</strong> {pest.control}</p>
+                </details>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
   );
 
   function renderCropList(crops: any[]) {
@@ -680,49 +587,38 @@ const CropInfoPage: React.FC = () => {
     }
 
     return (
-      <Grid container spacing={2} sx={{ p: 2 }}>
-        {crops.map((crop) => (
-          <Grid item xs={12} sm={6} md={selectedCrop ? 12 : 4} lg={selectedCrop ? 12 : 3} key={crop.id}>
-            <Card 
-              sx={{ 
-                cursor: 'pointer', 
-                height: '100%',
-                bgcolor: selectedCrop?.id === crop.id ? 'rgba(76, 175, 80, 0.1)' : 'transparent',
-                '&:hover': { bgcolor: 'rgba(76, 175, 80, 0.05)' },
-                border: selectedCrop?.id === crop.id ? `1px solid ${theme.palette.primary.main}` : 'none',
-              }}
-              onClick={() => handleCropSelect(crop)}
-            >
-              <CardContent>
-                <Typography variant="h6" component="div">
-                  {language === 'hi' && crop.nameHi ? crop.nameHi : crop.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {crop.category}
-                </Typography>
-                <Box sx={{ mt: 1, display: 'flex', gap: 0.5 }}>
-                  {crop.popular && (
-                    <Chip 
-                      label={t.popular} 
-                      size="small" 
-                      color="primary" 
-                      variant="outlined" 
-                    />
-                  )}
-                  {crop.seasonal && (
-                    <Chip 
-                      label={t.seasonal} 
-                      size="small" 
-                      color="secondary" 
-                      variant="outlined" 
-                    />
-                  )}
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+      {crops.map((crop) => {
+        const isSelected = selectedCrop?.id === crop.id;
+        return (
+          <div
+            key={crop.id}
+            className={`cursor-pointer h-full rounded-lg border transition duration-200 p-4 
+              ${isSelected ? 'bg-green-50 border-green-500' : 'bg-white hover:bg-green-50 border-transparent'}
+            `}
+            onClick={() => handleCropSelect(crop)}
+          >
+            <h3 className="text-lg font-semibold mb-1">
+              {language === 'hi' && crop.nameHi ? crop.nameHi : crop.name}
+            </h3>
+            <p className="text-sm text-gray-600">{crop.category}</p>
+
+            <div className="flex gap-2 mt-2">
+              {crop.popular && (
+                <span className="text-xs px-2 py-1 rounded border border-green-600 text-green-700">
+                  {t.popular}
+                </span>
+              )}
+              {crop.seasonal && (
+                <span className="text-xs px-2 py-1 rounded border border-purple-600 text-purple-700">
+                  {t.seasonal}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
     );
   }
 };

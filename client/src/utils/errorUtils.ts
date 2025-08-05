@@ -1,7 +1,7 @@
 // Utilities for error handling, tracking, and logging
 
-import { getLanguage } from './languageUtils';
-import { trackAppError, trackApiError } from './analyticsUtils';
+import { getLanguage } from './languageUtils.ts';
+import { trackAppError, trackApiError } from './analyticsUtils.ts';
 
 // Error severity levels
 export enum ErrorSeverity {
