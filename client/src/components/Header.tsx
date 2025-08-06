@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Menu, User, LogIn, LogOut, UserPlus, Languages, MenuIcon,PersonStandingIcon,LogOutIcon,LogInIcon } from 'lucide-react';
+import { Menu, User, LogIn, LogOut, UserPlus, Languages, MenuIcon,PersonStandingIcon,LogOutIcon,LogInIcon ,  Leaf,
+  MessageCircle,
+  CloudSun,
+  Banknote,
+ } from 'lucide-react';
 
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext.tsx';
@@ -77,8 +81,12 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen, toggleSidebar }) => {
           { text: t('nav.logout'), icon: <LogOutIcon />, onClick: handleLogout },
         ]
       : [
-          { text: t('nav.login'), icon: <LogInIcon />, path: '/login' },
+          { text: t('nav.Home'), icon: <LogInIcon />, path: '/login' },
+          { text: t('nav.Chat'), icon: <LogInIcon />, path: '/register' },
+          { text: t('nav.CropInfo'), icon: <LogInIcon />, path: '/register' },
+          { text: t('nav.Diagnosis'), icon: <LogInIcon />, path: '/register' },
           { text: t('nav.register'), icon: <LogInIcon />, path: '/register' },
+          { text: t('nav.login'), icon: <LogInIcon />, path: '/register' },
         ];
   }, [t, isAuthenticated, handleLogout]); // Dependencies ensure the array is recreated when language or auth state changes
 
@@ -86,26 +94,25 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen, toggleSidebar }) => {
 
   return (
     <>
-     <nav className="fixed top-0 left-0 w-full z-90  text-black shadow backdrop-blur-lg">
+     <nav className="fixed top-0 left-0 w-full z-90  text-black bg-white/30  backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
         {/* Left: Sidebar Toggle + Logo */}
         <div className="flex items-center space-x-4">
-          <button onClick={toggleSidebar} className="p-2 hover:bg-blue-500 rounded">
+          {/* <button onClick={toggleSidebar} className="p-2 hover:bg-blue-500 rounded">
             <MenuIcon className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-semibold">KrishiMitra</h1>
+          </button> */}
+            <Link
+            className="hover:cursor:pointer"
+                    to="/">
+          <h1 className="text-lg font-semibold ">KrishiMitra</h1>
+          </Link>
         </div>
 
         {/* Right: Language Switch + Auth/Profile */}
         <div className="relative flex items-center space-x-2 sm:space-x-4">
           {/* Language Switcher */}
           <div className="relative">
-            <button
-              onClick={() => setLanguageMenuAnchor(!languageMenuAnchor)}
-              className="p-2 hover:bg-blue-500 rounded"
-            >
-              <Languages className="w-5 h-5" />
-            </button>
+           
             {languageMenuAnchor && (
               <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow">
                 {languages.map((lang) => (
@@ -160,22 +167,49 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen, toggleSidebar }) => {
               )}
             </div>
           ) : (
-            <div className="flex items-center space-x-2">
-              <Link
-                to="/login"
-                className="flex items-center px-3 py-1 rounded hover:bg-blue-500 text-sm"
-              >
-                <LogIn className="w-4 h-4 mr-1" />
-                {t('nav.login')}
-              </Link>
-              <Link
-                to="/register"
-                className="flex items-center px-3 py-1 border border-white rounded hover:bg-white hover:text-blue-700 text-sm"
-              >
-                <UserPlus className="w-4 h-4 mr-1" />
-                {t('nav.register')}
-              </Link>
-            </div>
+           <div className="flex items-center space-x-3">
+  <Link
+    to="/crops"
+    className="flex items-center px-3 py-1.5 hover:underline text-green-800 rounded hover:bg-green-100 text-sm font-medium"
+  >
+    <Leaf className="w-4 h-4 mr-1" />
+    {t("CropInfo")}
+  </Link>
+  <Link
+    to="/chat"
+    className="flex items-center px-3 py-1.5 hover:underline  text-green-800 rounded hover:bg-green-100 text-sm font-medium"
+  >
+    <MessageCircle className="w-4 h-4 mr-1" />
+    {t("ChatBot")}
+  </Link>
+  <Link
+    to="/weather"
+    className="flex items-center px-3 py-1.5 hover:underline  text-green-800 rounded hover:bg-green-100 text-sm font-medium"
+  >
+    <CloudSun className="w-4 h-4 mr-1" />
+    {t("Weather")}
+  </Link>
+  <Link
+    to="/finance"
+    className="flex items-center px-3 py-1.5 hover:underline  text-green-800 rounded hover:bg-green-100 text-sm font-medium"
+  >
+    <Banknote className="w-4 h-4 mr-1" />
+    {t("Finance")}
+  </Link>
+   <button
+              onClick={() => setLanguageMenuAnchor(!languageMenuAnchor)}
+              className="p-2  rounded"
+            >
+              <Languages className="w-5 h-5" />
+            </button>
+  <Link
+    to="/login"
+    className="flex items-center px-4 py-1.5 bg-green-700 text-white rounded hover:bg-green-800 text-sm font-semibold shadow"
+  >
+    <LogIn className="w-4 h-4 mr-1" />
+    {t("nav.login")}
+  </Link>
+</div>
           )}
         </div>
       </div>

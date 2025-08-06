@@ -1,626 +1,647 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Typography,
-  Box,
-  Grid,
-  Paper,
-  Card,
-  CardContent,
-  TextField,
-  InputAdornment,
-  Tabs,
-  Tab,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  CircularProgress,
-  Alert,
-  useTheme
-} from '@mui/material';
-import {
-  Search as SearchIcon,
-  ExpandMore as ExpandMoreIcon,
-  Grass as CropIcon,
-  WaterDrop as WaterIcon,
-  WbSunny as SunIcon,
-  Spa as SeedIcon,
-  BugReport as PestIcon,
-  LocalOffer as PriceIcon
-} from '@mui/icons-material';
-import { useLanguage } from '../contexts/LanguageContext.tsx';
-import { useOfflineData } from '../contexts/OfflineDataContext.tsx';
+'use client'
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
+import React, { useState, useEffect } from 'react'
+import { ChevronDown, Loader2, AlertCircle, BarChart3, MapPin, Search, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
+
+// Types for the API response
+interface ApiCropData {
+  commodity: string
+  state: string
+  district: string
+  market: string
+  variety: string
+  grade: string
+  arrival_date: string
+  min_price: string
+  max_price: string
+  modal_price: string
+  Commodity: string
+  State: string
+  District: string
+  Market: string
+  Variety: string
+  Grade: string
+  Arrival_Date: string
+  Min_Price: string
+  Max_Price: string
+  Modal_Price: string
 }
 
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`crop-tabpanel-${index}`}
-      aria-labelledby={`crop-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
+interface ApiResponse {
+  records: ApiCropData[]
+  total: number
+  count: number
+  offset: number
 }
 
-function a11yProps(index: number) {
-  return {
-    id: `crop-tab-${index}`,
-    'aria-controls': `crop-tabpanel-${index}`,
-  };
-}
+// Indian States and Union Territories
+const indianStates = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+  'Andaman and Nicobar Islands',
+  'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi',
+  'Jammu and Kashmir',
+  'Ladakh',
+  'Lakshadweep',
+  'Puducherry'
+].sort()
+
+// Common crop suggestions
+const cropSuggestions = [
+  'Rice', 'Wheat', 'Sugarcane', 'Cotton', 'Maize', 'Bajra', 'Jowar', 'Barley',
+  'Gram', 'Tur', 'Moong', 'Urad', 'Masoor', 'Groundnut', 'Mustard', 'Sunflower',
+  'Soybean', 'Sesamum', 'Niger', 'Safflower', 'Castor', 'Linseed', 'Potato',
+  'Onion', 'Tomato', 'Brinjal', 'Cabbage', 'Cauliflower', 'Okra', 'Chilli',
+  'Turmeric', 'Coriander', 'Cumin', 'Fenugreek', 'Garlic', 'Ginger', 'Cardamom',
+  'Black Pepper', 'Coconut', 'Areca Nut', 'Cashew', 'Tea', 'Coffee', 'Rubber',
+  'Jute', 'Mesta', 'Apple', 'Banana', 'Mango', 'Orange', 'Grapes', 'Pomegranate'
+]
 
 const translations = {
   en: {
-    title: 'Crop Information',
-    search: 'Search crops...',
-    popular: 'Popular Crops',
-    seasonal: 'Seasonal Recommendations',
-    all: 'All Crops',
-    cultivation: 'Cultivation Practices',
-    varieties: 'Varieties',
-    pests: 'Pests & Diseases',
-    market: 'Market Information',
-    loading: 'Loading crop data...',
-    error: 'Failed to load crop data',
-    offline: 'You are viewing cached crop data',
-    waterReq: 'Water Requirements',
-    sunReq: 'Sunlight Requirements',
-    soilType: 'Soil Type',
-    growingSeason: 'Growing Season',
-    harvestTime: 'Harvest Time',
-    yield: 'Expected Yield',
-    currentPrice: 'Current Market Price',
-    priceRange: 'Price Range (Last 30 days)',
-    majorMarkets: 'Major Markets',
-    noResults: 'No crops found matching your search',
+    title: 'Crop Market Information',
+    selectState: 'Select State',
+    selectCommodity: 'Enter Commodity/Crop Name',
+    commodityPlaceholder: 'Type crop name (e.g., Rice, Wheat, Cotton...)',
+    result: 'Result',
+    prices: 'Prices',
+    modalPrice: 'Modal Price',
+    grade: 'Grade',
+    variety: 'Variety',
+    loading: 'Loading...',
+    error: 'Failed to load data',
+    retry: 'Retry',
+    noData: 'No data available for selected filters',
+    selectBoth: 'Please select state and enter commodity name to view results',
+    welcomeTitle: 'Welcome to Crop Market Information System',
+    welcomeSubtitle: 'Get real-time market prices for agricultural commodities across India',
+    instructions: 'Select a state and enter a commodity name to view current market prices and trends.',
+    suggestions: 'Popular crops:',
+    showingResults: 'Showing',
+    of: 'of',
+    results: 'results',
+    previous: 'Previous',
+    next: 'Next',
+    page: 'Page',
+    searchResults: 'Search in results...',
+    searchPlaceholder: 'Search by district, market, variety, grade, or price...',
+    clearSearch: 'Clear search',
+    noSearchResults: 'No results found for your search'
   },
   hi: {
-    title: 'फसल जानकारी',
-    search: 'फसलों की खोज करें...',
-    popular: 'लोकप्रिय फसलें',
-    seasonal: 'मौसमी अनुशंसाएँ',
-    all: 'सभी फसलें',
-    cultivation: 'खेती प्रथाएँ',
-    varieties: 'किस्में',
-    pests: 'कीट और रोग',
-    market: 'बाजार जानकारी',
-    loading: 'फसल डेटा लोड हो रहा है...',
-    error: 'फसल डेटा लोड करने में विफल',
-    offline: 'आप कैश्ड फसल डेटा देख रहे हैं',
-    waterReq: 'पानी की आवश्यकता',
-    sunReq: 'धूप की आवश्यकता',
-    soilType: 'मिट्टी का प्रकार',
-    growingSeason: 'उगाने का मौसम',
-    harvestTime: 'कटाई का समय',
-    yield: 'अपेक्षित उपज',
-    currentPrice: 'वर्तमान बाजार मूल्य',
-    priceRange: 'मूल्य सीमा (पिछले 30 दिन)',
-    majorMarkets: 'प्रमुख बाजार',
-    noResults: 'आपकी खोज से मेल खाती कोई फसल नहीं मिली',
-  },
-  // Add more languages as needed
-};
+    title: 'फसल बाजार जानकारी',
+    selectState: 'राज्य चुनें',
+    selectCommodity: 'वस्तु/फसल का नाम दर्ज करें',
+    commodityPlaceholder: 'फसल का नाम टाइप करें (जैसे चावल, गेहूं, कपास...)',
+    result: 'परिणाम',
+    prices: 'मूल्य',
+    modalPrice: 'मॉडल मूल्य',
+    grade: 'ग्रेड',
+    variety: 'किस्म',
+    loading: 'लोड हो रहा है...',
+    error: 'डेटा लोड करने में विफल',
+    retry: 'पुनः प्रयास करें',
+    noData: 'चयनित फिल्टर के लिए कोई डेटा उपलब्ध नहीं',
+    selectBoth: 'परिणाम देखने के लिए कृपया राज्य चुनें और वस्तु का नाम दर्ज करें',
+    welcomeTitle: 'फसल बाजार सूचना प्रणाली में आपका स्वागत है',
+    welcomeSubtitle: 'भारत भर में कृषि वस्तुओं के लिए वास्तविक समय के बाजार मूल्य प्राप्त करें',
+    instructions: 'वर्तमान बाजार मूल्य और रुझान देखने के लिए एक राज्य चुनें और वस्तु का नाम दर्ज करें।',
+    suggestions: 'लोकप्रिय फसलें:',
+    showingResults: 'दिखा रहे हैं',
+    of: 'में से',
+    results: 'परिणाम',
+    previous: 'पिछला',
+    next: 'अगला',
+    page: 'पृष्ठ',
+    searchResults: 'परिणामों में खोजें...',
+    searchPlaceholder: 'जिला, बाजार, किस्म, ग्रेड या मूल्य द्वारा खोजें...',
+    clearSearch: 'खोज साफ़ करें',
+    noSearchResults: 'आपकी खोज के लिए कोई परिणाम नहीं मिला'
+  }
+}
 
-// Sample crop data (in a real app, this would come from an API)
-const sampleCropData = {
-  crops: [
-    {
-      id: 1,
-      name: 'Rice',
-      nameHi: 'चावल',
-      image: 'rice.jpg',
-      category: 'Cereal',
-      popular: true,
-      seasonal: true,
-      waterRequirement: 'High',
-      sunlightRequirement: 'Full Sun',
-      soilType: 'Clay or loamy soil',
-      growingSeason: 'Kharif (Monsoon)',
-      harvestTime: '3-6 months after planting',
-      expectedYield: '4-6 tonnes/hectare',
-      cultivation: [
-        'Prepare the land by plowing and leveling',
-        'Soak seeds for 24 hours before sowing',
-        'Maintain water level of 2-5 cm during growth phase',
-        'Apply fertilizers as per soil test recommendations',
-        'Control weeds during initial growth stages'
-      ],
-      varieties: [
-        { name: 'Basmati', characteristics: 'Aromatic, long grain', suitableRegions: 'North India' },
-        { name: 'IR-36', characteristics: 'High yield, disease resistant', suitableRegions: 'All regions' },
-        { name: 'Sona Masuri', characteristics: 'Medium grain, popular', suitableRegions: 'South India' }
-      ],
-      pests: [
-        { name: 'Rice Stem Borer', symptoms: 'Dead hearts in vegetative stage', control: 'Carbofuran application' },
-        { name: 'Blast', symptoms: 'Lesions on leaves', control: 'Fungicide application, resistant varieties' },
-        { name: 'Brown Plant Hopper', symptoms: 'Plants turn yellow and dry', control: 'Drain fields, use resistant varieties' }
-      ],
-      market: {
-        currentPrice: '₹ 2,000 - 3,500 per quintal',
-        priceRange: '₹ 1,800 - 3,800 per quintal',
-        majorMarkets: ['Karnal', 'Ludhiana', 'Burdwan', 'Raichur']
-      }
-    },
-    {
-      id: 2,
-      name: 'Wheat',
-      nameHi: 'गेहूं',
-      image: 'wheat.jpg',
-      category: 'Cereal',
-      popular: true,
-      seasonal: true,
-      waterRequirement: 'Medium',
-      sunlightRequirement: 'Full Sun',
-      soilType: 'Loamy soil',
-      growingSeason: 'Rabi (Winter)',
-      harvestTime: '4-5 months after sowing',
-      expectedYield: '3-5 tonnes/hectare',
-      cultivation: [
-        'Prepare fine tilth by plowing and harrowing',
-        'Sow seeds at 4-5 cm depth in rows',
-        'First irrigation after 21 days of sowing',
-        'Apply nitrogen fertilizer in split doses',
-        'Harvest when grains become hard'
-      ],
-      varieties: [
-        { name: 'HD-2967', characteristics: 'High yield, disease resistant', suitableRegions: 'North India' },
-        { name: 'PBW-550', characteristics: 'Good quality, heat tolerant', suitableRegions: 'Punjab, Haryana' },
-        { name: 'Lok-1', characteristics: 'Drought tolerant', suitableRegions: 'Central India' }
-      ],
-      pests: [
-        { name: 'Aphids', symptoms: 'Curling of leaves, stunted growth', control: 'Spray insecticides' },
-        { name: 'Rust', symptoms: 'Reddish-brown pustules on leaves', control: 'Fungicide application, resistant varieties' },
-        { name: 'Powdery Mildew', symptoms: 'White powdery growth on leaves', control: 'Sulfur spray' }
-      ],
-      market: {
-        currentPrice: '₹ 1,975 per quintal (MSP)',
-        priceRange: '₹ 1,900 - 2,200 per quintal',
-        majorMarkets: ['Khanna', 'Karnal', 'Indore', 'Sehore']
-      }
-    },
-    {
-      id: 3,
-      name: 'Cotton',
-      nameHi: 'कपास',
-      image: 'cotton.jpg',
-      category: 'Fiber',
-      popular: true,
-      seasonal: false,
-      waterRequirement: 'Medium',
-      sunlightRequirement: 'Full Sun',
-      soilType: 'Black soil, alluvial soil',
-      growingSeason: 'Kharif (Monsoon)',
-      harvestTime: '6-8 months after sowing',
-      expectedYield: '15-20 quintals/hectare',
-      cultivation: [
-        'Deep plowing in summer',
-        'Sow seeds after first monsoon rains',
-        'Maintain proper spacing between plants',
-        'Apply fertilizers as per soil test',
-        'Irrigate at critical growth stages'
-      ],
-      varieties: [
-        { name: 'Bt Cotton', characteristics: 'Pest resistant, high yield', suitableRegions: 'All cotton growing regions' },
-        { name: 'Desi Cotton', characteristics: 'Drought tolerant, short duration', suitableRegions: 'Rainfed areas' },
-        { name: 'ELS Cotton', characteristics: 'Extra long staple', suitableRegions: 'South India' }
-      ],
-      pests: [
-        { name: 'Bollworm', symptoms: 'Holes in bolls, shedding of buds', control: 'Bt cotton, insecticides' },
-        { name: 'Whitefly', symptoms: 'Yellowing of leaves, sticky leaves', control: 'Neem oil spray, yellow sticky traps' },
-        { name: 'Pink Bollworm', symptoms: 'Rosette flowers, damaged seeds', control: 'Pheromone traps, early sowing' }
-      ],
-      market: {
-        currentPrice: '₹ 6,000 - 7,000 per quintal',
-        priceRange: '₹ 5,500 - 7,500 per quintal',
-        majorMarkets: ['Guntur', 'Adilabad', 'Bathinda', 'Rajkot']
-      }
-    },
-    {
-      id: 4,
-      name: 'Sugarcane',
-      nameHi: 'गन्ना',
-      image: 'sugarcane.jpg',
-      category: 'Cash Crop',
-      popular: true,
-      seasonal: false,
-      waterRequirement: 'High',
-      sunlightRequirement: 'Full Sun',
-      soilType: 'Loamy soil, alluvial soil',
-      growingSeason: 'Spring/Autumn',
-      harvestTime: '10-12 months after planting',
-      expectedYield: '80-100 tonnes/hectare',
-      cultivation: [
-        'Deep plowing and field preparation',
-        'Use disease-free setts for planting',
-        'Plant in furrows at proper spacing',
-        'Apply organic manure before planting',
-        'Irrigate at critical growth stages'
-      ],
-      varieties: [
-        { name: 'Co-86032', characteristics: 'High yield, high sugar content', suitableRegions: 'Maharashtra, Karnataka' },
-        { name: 'Co-0238', characteristics: 'Early maturing, high sugar recovery', suitableRegions: 'North India' },
-        { name: 'Co-62175', characteristics: 'Drought tolerant', suitableRegions: 'Rainfed areas' }
-      ],
-      pests: [
-        { name: 'Pyrilla', symptoms: 'Yellowing of leaves, sooty mold', control: 'Spray insecticides, biological control' },
-        { name: 'Red Rot', symptoms: 'Red discoloration in stalk', control: 'Use resistant varieties, hot water treatment of setts' },
-        { name: 'Top Borer', symptoms: 'Dead heart in top shoots', control: 'Remove and destroy affected shoots' }
-      ],
-      market: {
-        currentPrice: '₹ 285 - 315 per quintal (FRP)',
-        priceRange: '₹ 280 - 350 per quintal',
-        majorMarkets: ['Muzaffarnagar', 'Kolhapur', 'Coimbatore', 'Mandya']
-      }
-    },
-    {
-      id: 5,
-      name: 'Potato',
-      nameHi: 'आलू',
-      image: 'potato.jpg',
-      category: 'Vegetable',
-      popular: true,
-      seasonal: true,
-      waterRequirement: 'Medium',
-      sunlightRequirement: 'Full Sun',
-      soilType: 'Sandy loam, loamy soil',
-      growingSeason: 'Rabi (Winter)',
-      harvestTime: '75-120 days after planting',
-      expectedYield: '25-30 tonnes/hectare',
-      cultivation: [
-        'Prepare fine tilth by plowing and harrowing',
-        'Use certified seed tubers',
-        'Plant at proper spacing and depth',
-        'Earth up after 30 days of planting',
-        'Irrigate at critical growth stages'
-      ],
-      varieties: [
-        { name: 'Kufri Jyoti', characteristics: 'Early maturing, resistant to late blight', suitableRegions: 'Hills and plains' },
-        { name: 'Kufri Chipsona', characteristics: 'Suitable for processing', suitableRegions: 'North and West India' },
-        { name: 'Kufri Pukhraj', characteristics: 'High yield, yellow flesh', suitableRegions: 'All potato growing regions' }
-      ],
-      pests: [
-        { name: 'Late Blight', symptoms: 'Water-soaked lesions on leaves', control: 'Fungicide application, resistant varieties' },
-        { name: 'Early Blight', symptoms: 'Dark brown spots with concentric rings', control: 'Fungicide spray' },
-        { name: 'Potato Tuber Moth', symptoms: 'Tunnels in tubers', control: 'Proper storage, insecticides' }
-      ],
-      market: {
-        currentPrice: '₹ 1,200 - 2,000 per quintal',
-        priceRange: '₹ 800 - 2,500 per quintal',
-        majorMarkets: ['Agra', 'Farrukhabad', 'Jalandhar', 'Hooghly']
-      }
-    }
-  ],
-  lastUpdated: new Date().toISOString(),
-};
+const ITEMS_PER_PAGE = 10
 
-const CropInfoPage: React.FC = () => {
-  const { language } = useLanguage();
-  const { cachedData, updateCropData } = useOfflineData();
-  const theme = useTheme();
-  
-  const t = translations[language as keyof typeof translations] || translations.en;
-  
-  const [tabValue, setTabValue] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [cropData, setCropData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isOfflineData, setIsOfflineData] = useState(false);
-  const [selectedCrop, setSelectedCrop] = useState<any>(null);
-  const [cropDetailTab, setCropDetailTab] = useState(0);
+export default function CropInfoPage() {
+  const [language, setLanguage] = useState<'en' | 'hi'>('en')
+  const [selectedState, setSelectedState] = useState('')
+  const [commodityInput, setCommodityInput] = useState('')
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [results, setResults] = useState<ApiCropData[]>([])
+  const [allResults, setAllResults] = useState<ApiCropData[]>([])
+  const [filteredResults, setFilteredResults] = useState<ApiCropData[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [totalResults, setTotalResults] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
+  const t = translations[language]
 
-  const handleCropDetailTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setCropDetailTab(newValue);
-  };
+  // Filter crop suggestions based on input
+  const filteredSuggestions = cropSuggestions.filter(crop =>
+    crop.toLowerCase().includes(commodityInput.toLowerCase())
+  ).slice(0, 8)
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
+  // Calculate pagination values for filtered results
+  const totalPages = Math.ceil(filteredResults.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE + 1
+  const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, filteredResults.length)
+  const paginatedResults = filteredResults.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
 
-  const handleCropSelect = (crop: any) => {
-    setSelectedCrop(crop);
-    setCropDetailTab(0); // Reset to first tab when selecting a new crop
-  };
+  // Search function for filtering results
+  const searchInResults = (query: string, data: ApiCropData[]) => {
+    if (!query.trim()) return data
 
+    const searchTerm = query.toLowerCase()
+    return data.filter(record => {
+      const district = (record.District || record.district || '').toLowerCase()
+      const market = (record.Market || record.market || '').toLowerCase()
+      const variety = (record.Variety || record.variety || '').toLowerCase()
+      const grade = (record.Grade || record.grade || '').toLowerCase()
+      const commodity = (record.Commodity || record.commodity || '').toLowerCase()
+      const minPrice = (record.Min_Price || record.min_price || '').toString()
+      const maxPrice = (record.Max_Price || record.max_price || '').toString()
+      const modalPrice = (record.Modal_Price || record.modal_price || '').toString()
+
+      return district.includes(searchTerm) ||
+             market.includes(searchTerm) ||
+             variety.includes(searchTerm) ||
+             grade.includes(searchTerm) ||
+             commodity.includes(searchTerm) ||
+             minPrice.includes(searchTerm) ||
+             maxPrice.includes(searchTerm) ||
+             modalPrice.includes(searchTerm)
+    })
+  }
+
+  // Handle search in results
   useEffect(() => {
-    const fetchCropData = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // In a real app, we would fetch from an API here
-        // For now, we'll use the sample data after a short delay
-        // await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Always set the data from the sample data first
-        // This ensures we always have data to display
-        setCropData(sampleCropData);
-        
-        // Cache the data for offline use
-        updateCropData(sampleCropData);
-        
-        // Check if we're offline and have cached data
-        if (!navigator.onLine && cachedData.cropData) {
-          setIsOfflineData(true);
-        } else {
-          setIsOfflineData(false);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
+    const filtered = searchInResults(searchQuery, allResults)
+    setFilteredResults(filtered)
+    setCurrentPage(1) // Reset to first page when searching
+  }, [searchQuery, allResults])
+
+  // Fetch all results for the selected state and commodity
+  const fetchAllResults = async () => {
+    if (!selectedState || !commodityInput.trim()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      // First, get the total count
+      const countResponse = await fetch(
+        `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=579b464db66ec23bdd0000010e30f72ab0aa45674921636e6cbe8864&format=json&filters[State]=${encodeURIComponent(selectedState)}&filters[Commodity]=${encodeURIComponent(commodityInput.trim())}&limit=1`
+      )
+
+      if (!countResponse.ok) {
+        throw new Error(`HTTP error! status: ${countResponse.status}`)
       }
-    };
 
-    fetchCropData();
-  }, [cachedData.cropData, updateCropData]);
+      const countData: ApiResponse = await countResponse.json()
+      const total = countData.total || countData.count || 0
 
-  // Filter crops based on search query and selected tab
-  const getFilteredCrops = () => {
-    if (!cropData) return [];
-    
-    let filtered = cropData.crops;
-    
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((crop: any) => 
-        crop.name.toLowerCase().includes(query) || 
-        (crop.nameHi && crop.nameHi.toLowerCase().includes(query)) ||
-        crop.category.toLowerCase().includes(query)
-      );
+      if (total === 0) {
+        setAllResults([])
+        setFilteredResults([])
+        setTotalResults(0)
+        setLoading(false)
+        return
+      }
+
+      // Fetch all results
+      const response = await fetch(
+        `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=579b464db66ec23bdd0000010e30f72ab0aa45674921636e6cbe8864&format=json&filters[State]=${encodeURIComponent(selectedState)}&filters[Commodity]=${encodeURIComponent(commodityInput.trim())}&limit=${total}`
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data: ApiResponse = await response.json()
+      
+      // Sort by arrival date (newest first)
+      const sortedResults = (data.records || []).sort((a, b) => {
+        const dateA = parseDate(a.Arrival_Date || a.arrival_date)
+        const dateB = parseDate(b.Arrival_Date || b.arrival_date)
+        return dateB.getTime() - dateA.getTime()
+      })
+      
+      setAllResults(sortedResults)
+      setFilteredResults(sortedResults)
+      setTotalResults(total)
+      setCurrentPage(1)
+    } catch (err) {
+      console.error('Error fetching results:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch results')
+      setAllResults([])
+      setFilteredResults([])
+      setTotalResults(0)
+    } finally {
+      setLoading(false)
     }
-    
-    // Apply tab filter
-    if (tabValue === 1) { // Popular crops
-      filtered = filtered.filter((crop: any) => crop.popular);
-    } else if (tabValue === 2) { // Seasonal recommendations
-      filtered = filtered.filter((crop: any) => crop.seasonal);
-    }
-    
-    return filtered;
-  };
-
-  if (loading) {
-    return (
-        <div className="max-w-screen-lg mx-auto mt-4 mb-4 text-center">
-      <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-green-500 border-t-transparent"></div>
-      <h2 className="mt-2 text-lg font-medium text-gray-700">Loading...</h2>
-    </div>
-    );
   }
 
-  if (error) {
-    return (
-       <div className="max-w-screen-lg mx-auto mt-4 mb-4">
-  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-    <strong className="font-bold">{t.error}:</strong>
-    <span className="block sm:inline ml-1">{error}</span>
-  </div>
-</div>
-    );
+  // Parse date in DD/MM/YYYY format
+  const parseDate = (dateString: string): Date => {
+    if (!dateString) return new Date(0)
+    
+    try {
+      // Handle DD/MM/YYYY format
+      const parts = dateString.split('/')
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10)
+        const month = parseInt(parts[1], 10) - 1 // Month is 0-indexed
+        const year = parseInt(parts[2], 10)
+        return new Date(year, month, day)
+      }
+      return new Date(dateString)
+    } catch {
+      return new Date(0)
+    }
   }
 
-  const filteredCrops = getFilteredCrops();
+  // Reset to first page when filters change
+  useEffect(() => {
+    if (selectedState && commodityInput.trim()) {
+      const timeoutId = setTimeout(() => {
+        setSearchQuery('') // Clear search when filters change
+        fetchAllResults()
+      }, 500) // Debounce API calls
+
+      return () => clearTimeout(timeoutId)
+    } else {
+      setAllResults([])
+      setFilteredResults([])
+      setTotalResults(0)
+      setCurrentPage(1)
+      setSearchQuery('')
+    }
+  }, [selectedState, commodityInput])
+
+  const handleCommodityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCommodityInput(e.target.value)
+    setShowSuggestions(true)
+  }
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setCommodityInput(suggestion)
+    setShowSuggestions(false)
+  }
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+      setCurrentPage(page)
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    
+    try {
+      const date = parseDate(dateString)
+      if (date.getTime() === 0) return dateString
+      
+      return date.toLocaleDateString('en-GB')
+    } catch {
+      return dateString
+    }
+  }
+
+  const formatPrice = (price: string) => {
+    const numPrice = parseFloat(price)
+    return isNaN(numPrice) ? price : numPrice.toFixed(0)
+  }
+
+  const clearSearch = () => {
+    setSearchQuery('')
+  }
 
   return (
-<div className="max-w-8xl bg-white-400 mx-auto px-4 py-8">
-  <h1 className="text-3xl font-bold mb-4">{t.title}</h1>
-
-  {isOfflineData && (
-    <div className="bg-blue-100 border border-blue-300 text-blue-800 px-4 py-2 rounded mb-4">
-      {t.offline}
-    </div>
-  )}
-
-  {/* Search Bar */}
-  <div className="bg-white shadow p-4 rounded-xl mb-6">
-    <div className="flex items-center border rounded px-3 py-2">
-      <SearchIcon className="text-gray-500 mr-2" />
-      <input
-        type="text"
-        placeholder={t.search}
-        value={searchQuery}
-        onChange={handleSearchChange}
-        className="w-full outline-none bg-transparent"
-      />
-    </div>
-  </div>
-
-  {/* Grid Layout */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {/* Crop List */}
-    <div className={`${selectedCrop ? 'md:col-span-1' : 'md:col-span-3'} bg-white rounded-xl shadow`}>
-      <div className="border-b border-gray-200">
-        <div className="flex">
-          <button className={`flex-1 p-3 ${tabValue === 0 ? 'border-b-2 border-green-600 font-semibold' : ''}`} onClick={() => handleTabChange(null, 0)}>{t.all}</button>
-          <button className={`flex-1 p-3 ${tabValue === 1 ? 'border-b-2 border-green-600 font-semibold' : ''}`} onClick={() => handleTabChange(null, 1)}>{t.popular}</button>
-          <button className={`flex-1 p-3 ${tabValue === 2 ? 'border-b-2 border-green-600 font-semibold' : ''}`} onClick={() => handleTabChange(null, 2)}>{t.seasonal}</button>
-        </div>
-      </div>
-      <div className="p-4">
-        {tabValue === 0 && renderCropList(filteredCrops)}
-        {tabValue === 1 && renderCropList(filteredCrops)}
-        {tabValue === 2 && renderCropList(filteredCrops)}
-      </div>
-    </div>
-
-    {/* Crop Details */}
-    {selectedCrop && (
-      <div className="md:col-span-2 bg-white rounded-xl shadow overflow-hidden">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="bg-green-600 text-white p-4 rounded-t-xl">
-          <h2 className="text-xl font-bold">
-            {language === 'hi' && selectedCrop.nameHi ? selectedCrop.nameHi : selectedCrop.name}
-          </h2>
-          <p className="text-sm">{selectedCrop.category}</p>
-        </div>
-
-        {/* Overview Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-          {/* Attributes */}
-          <div className="space-y-4">
-            {[
-              { icon: <WaterIcon />, label: t.waterReq, value: selectedCrop.waterRequirement },
-              { icon: <SunIcon />, label: t.sunReq, value: selectedCrop.sunlightRequirement },
-              { icon: <CropIcon />, label: t.soilType, value: selectedCrop.soilType },
-              { icon: <SeedIcon />, label: t.growingSeason, value: selectedCrop.growingSeason },
-              { icon: <CropIcon />, label: t.harvestTime, value: selectedCrop.harvestTime },
-              { icon: <PriceIcon />, label: t.yield, value: selectedCrop.expectedYield },
-            ].map(({ icon, label, value }, idx) => (
-              <div className="flex items-center gap-2" key={idx}>
-                {icon}
-                <div>
-                  <p className="text-xs text-gray-500">{label}</p>
-                  <p className="text-sm font-medium">{value}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Price Info */}
-          <div className="bg-gray-50 p-4 rounded">
-            <p className="text-lg font-semibold mb-2">{t.currentPrice}</p>
-            <p className="text-2xl text-green-600 font-bold">{selectedCrop.market.currentPrice}</p>
-            <p className="text-sm text-gray-600 mt-1">{t.priceRange}: {selectedCrop.market.priceRange}</p>
-            <div className="mt-4">
-              <p className="text-sm font-medium">{t.majorMarkets}:</p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {selectedCrop.market.majorMarkets.map((market, index) => (
-                  <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{market}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs for Details */}
-        <div className="border-t border-gray-200 px-4">
-          <div className="flex">
-            {['cultivation', 'varieties', 'pests'].map((tab, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleCropDetailTabChange(null, idx)}
-                className={`flex-1 text-sm p-2 ${cropDetailTab === idx ? 'border-b-2 border-green-600 font-semibold' : ''}`}
-              >
-                {t[tab]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="p-4">
-          {cropDetailTab === 0 && (
-            <ul className="space-y-2 list-disc list-inside">
-              {selectedCrop.cultivation.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          )}
-
-          {cropDetailTab === 1 && (
-            <div className="space-y-4">
-              {selectedCrop.varieties.map((variety, index) => (
-                <details key={index} className="border border-gray-200 rounded p-3">
-                  <summary className="font-semibold cursor-pointer">{variety.name}</summary>
-                  <p className="text-sm mt-2"><strong>Characteristics:</strong> {variety.characteristics}</p>
-                  <p className="text-sm"><strong>Suitable Regions:</strong> {variety.suitableRegions}</p>
-                </details>
-              ))}
-            </div>
-          )}
-
-          {cropDetailTab === 2 && (
-            <div className="space-y-4">
-              {selectedCrop.pests.map((pest, index) => (
-                <details key={index} className="border border-yellow-200 rounded p-3">
-                  <summary className="flex items-center text-yellow-700 font-semibold cursor-pointer">
-                    <PestIcon className="mr-2" /> {pest.name}
-                  </summary>
-                  <p className="text-sm mt-2"><strong>Symptoms:</strong> {pest.symptoms}</p>
-                  <p className="text-sm"><strong>Control Measures:</strong> {pest.control}</p>
-                </details>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    )}
-  </div>
-</div>
-
-  );
-
-  function renderCropList(crops: any[]) {
-    if (crops.length === 0) {
-      return (
-        <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="body1">{t.noResults}</Typography>
-        </Box>
-      );
-    }
-
-    return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-      {crops.map((crop) => {
-        const isSelected = selectedCrop?.id === crop.id;
-        return (
-          <div
-            key={crop.id}
-            className={`cursor-pointer h-full rounded-lg border transition duration-200 p-4 
-              ${isSelected ? 'bg-green-50 border-green-500' : 'bg-white hover:bg-green-50 border-transparent'}
-            `}
-            onClick={() => handleCropSelect(crop)}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">{t.title}</h1>
+          <button
+            onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
-            <h3 className="text-lg font-semibold mb-1">
-              {language === 'hi' && crop.nameHi ? crop.nameHi : crop.name}
-            </h3>
-            <p className="text-sm text-gray-600">{crop.category}</p>
+            {language === 'en' ? 'हिंदी' : 'English'}
+          </button>
+        </div>
 
-            <div className="flex gap-2 mt-2">
-              {crop.popular && (
-                <span className="text-xs px-2 py-1 rounded border border-green-600 text-green-700">
-                  {t.popular}
-                </span>
+        {/* Filters */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* State Selector */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t.selectState}
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none appearance-none bg-white"
+                >
+                  <option value="">{t.selectState}</option>
+                  {indianStates.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Commodity Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t.selectCommodity}
+              </label>
+              <div className="relative">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black" />
+                  <input
+                    type="text"
+                    value={commodityInput}
+                    onChange={handleCommodityChange}
+                    onFocus={() => setShowSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    placeholder={t.commodityPlaceholder}
+                    className="w-full pl-10 pr-4 py-3 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                  />
+                </div>
+                
+                {/* Suggestions Dropdown */}
+                {showSuggestions && commodityInput && filteredSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Popular Crops */}
+          <div className="mt-6">
+            <p className="text-sm font-medium text-gray-700 mb-3">{t.suggestions}</p>
+            <div className="flex flex-wrap gap-2">
+              {cropSuggestions.slice(0, 12).map((crop, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCommodityInput(crop)}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-green-100 hover:text-green-700 transition-colors"
+                >
+                  {crop}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
+                <span className="text-red-800">{t.error}: {error}</span>
+              </div>
+              <button
+                onClick={fetchAllResults}
+                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
+              >
+                {t.retry}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Content Area */}
+        {!selectedState || !commodityInput.trim() ? (
+          /* Placeholder Content */
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="text-center py-16 px-8">
+              <img
+                src="/placeholder.svg?height=300&width=400&text=Welcome+to+Crop+Market+System"
+                alt="Welcome to Crop Market Information System"
+                className="mx-auto mb-8 rounded-lg opacity-50"
+              />
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{t.welcomeTitle}</h2>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">{t.welcomeSubtitle}</p>
+              <p className="text-sm text-gray-500">{t.instructions}</p>
+            </div>
+          </div>
+        ) : loading ? (
+          /* Loading State */
+          <div className="bg-white rounded-xl shadow-sm p-8">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-green-600 mx-auto mb-4" />
+              <p className="text-gray-600">{t.loading}</p>
+            </div>
+          </div>
+        ) : (
+          /* Results */
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">{t.result}</h2>
+                {totalResults > 0 && (
+                  <div className="text-sm text-gray-600">
+                    {t.showingResults} {startIndex}-{endIndex} {t.of} {filteredResults.length} {t.results}
+                    {searchQuery && ` (filtered from ${totalResults})`}
+                  </div>
+                )}
+              </div>
+
+              {/* Search in Results */}
+              {allResults.length > 0 && (
+                <div className="mb-6">
+                  <div className="relative">
+                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={t.searchPlaceholder}
+                      className="w-full pl-10 pr-10 py-3 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={clearSearch}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
               )}
-              {crop.seasonal && (
-                <span className="text-xs px-2 py-1 rounded border border-purple-600 text-purple-700">
-                  {t.seasonal}
-                </span>
+              
+              {filteredResults.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">
+                    {searchQuery ? t.noSearchResults : t.noData}
+                  </p>
+                  {!searchQuery && (
+                    <p className="text-sm text-gray-400 mt-2">
+                      Try checking the spelling or try a different commodity name
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="bg-green-50 rounded-lg p-6 mb-6">
+                    <div className="flex items-center mb-6">
+                      <BarChart3 className="h-6 w-6 text-green-600 mr-2" />
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        {commodityInput} {t.prices}
+                      </h3>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {paginatedResults.map((record, index) => (
+                        <div key={index} className="bg-white rounded-lg p-4 border border-green-200">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center mb-2">
+                                <MapPin className="h-4 w-4 text-blue-600 mr-1" />
+                                <span className="font-medium text-gray-900">
+                                  {record.Market || record.market}, {record.District || record.district}
+                                </span>
+                              </div>
+                              
+                              <div className="text-lg font-bold text-green-600 mb-2">
+                                ₹{formatPrice(record.Min_Price || record.min_price)} - ₹{formatPrice(record.Max_Price || record.max_price)}
+                              </div>
+                              
+                              <div className="text-sm text-gray-600 space-x-4">
+                                <span>
+                                  {t.modalPrice}: ₹{formatPrice(record.Modal_Price || record.modal_price)}
+                                </span>
+                                <span>|</span>
+                                <span>
+                                  {t.grade}: {record.Grade || record.grade || 'N/A'}
+                                </span>
+                                <span>|</span>
+                                <span>
+                                  {t.variety}: {record.Variety || record.variety || record.Commodity || record.commodity}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div className="text-right text-sm text-gray-500">
+                              {formatDate(record.Arrival_Date || record.arrival_date)}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <ChevronLeft className="h-4 w-4 mr-1" />
+                          {t.previous}
+                        </button>
+                        
+                        <div className="flex items-center space-x-1">
+                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            let pageNum
+                            if (totalPages <= 5) {
+                              pageNum = i + 1
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + i
+                            } else {
+                              pageNum = currentPage - 2 + i
+                            }
+                            
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => handlePageChange(pageNum)}
+                                className={`px-3 py-2 text-sm font-medium rounded-lg ${
+                                  currentPage === pageNum
+                                    ? 'bg-green-600 text-white'
+                                    : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            )
+                          })}
+                        </div>
+                        
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {t.next}
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </button>
+                      </div>
+                      
+                      <div className="text-sm text-gray-600">
+                        {t.page} {currentPage} {t.of} {totalPages}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
-        );
-      })}
+        )}
+      </div>
     </div>
-    );
-  }
-};
-
-export default CropInfoPage;
+  )
+}

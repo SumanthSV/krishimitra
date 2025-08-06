@@ -465,14 +465,14 @@ const ChatPage: React.FC = () => {
   const currentSession = getCurrentSession();
 
   return (
-   <div className="flex h-[90vh] bg-gradient-to-br from-gray-50 to-white">
+   <div className="flex h-[90vh] bg-white p-6 justify-center items-center mx-auto">
       {/* Sidebar */}
       <div
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed lg:relative lg:translate-x-0 z- w-72 h-full bg-white/95 backdrop-blur-xl border-r border-gray-200/50 transition-transform duration-300 ease-out shadow-2xl lg:shadow-none`}
+        } fixed lg:relative lg:translate-x-0 z- w-72 h-full bg-[#f9f9f9] border-r border-gray-200 transition-transform duration-300 ease-out shadow-2xl lg:shadow-none`}
       >
-        <div className="flex flex-col h-full fixed">
+        <div className="flex flex-col h-full fixed justify-center items-center">
           {/* Sidebar Header */}
           <div className="p-6 border-b border-gray-200/50">
             <div className="flex items-center justify-between">
@@ -521,7 +521,7 @@ const ChatPage: React.FC = () => {
                   const isActive = session.id === currentSessionId
                   const isMenuOpen = session.id === activeSessionForMenu
                   return (
-                    <div key={session.id} className="relative">
+                    <div key={session.id} className="relative min-w-56">
                       <div
                         onClick={() => {
                           setCurrentSessionId(session.id)
@@ -632,7 +632,7 @@ const ChatPage: React.FC = () => {
               <p className="text-gray-600 mb-8 text-lg leading-relaxed">{t("chat.welcomeMessage")}</p>
               <button
                 onClick={createNewSession}
-                className="inline-flex items-center gap-3  text-zinc-800 border border-zinc-800 py-4 px-8 rounded-xl transition-all duration-200 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="inline-flex items-center gap-3  text-zinc-800 border border-zinc-800 py-2 px-4 rounded-xl transition-all duration-200 text-md font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 <Plus className="w-6 h-6" />
                 {t("chat.startNewChat")}
@@ -645,13 +645,23 @@ const ChatPage: React.FC = () => {
             <div className="flex-1 overflow-hidden flex flex-col">
               <div className="flex-1 overflow-y-auto px-4 py-6">
                 {currentSession.messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full">
-                    {/* <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mb-4">
-                      <Bot className="w-8 h-8 text-emerald-600" />
-                    </div> */}
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">{t("chat.newChatTitle")}</h3>
-                    <p className="text-gray-600 text-center max-w-md leading-relaxed">{t("chat.newChatMessage")}</p>
-                  </div>
+                 <div className="flex flex-col items-center justify-center h-full px-4 py-8 rounded-xl ">
+  <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-lime-100 rounded-full flex items-center justify-center mb-4">
+    <Bot className="w-8 h-8 text-green-600" />
+  </div>
+  <h3 className="text-2xl font-bold text-gray-800 mb-2">💬 Need Help? Just Ask!</h3>
+  <p className="text-gray-600 text-center max-w-xl mb-6">
+    Get instant answers powered by AI — fast, local, and farmer-friendly.
+  </p>
+  <ul className="space-y-2 text-gray-700 text-center">
+    <li>🌾 How to treat leaf spot disease in groundnut?</li>
+    <li>🌿 What’s the ideal fertilizer for sugarcane?</li>
+    <li>🌧 Rain prediction in Mandya this week?</li>
+    <li>🥔 Tomato market rate in Hubli today?</li>
+    <li>🧅 Can I grow onions in August?</li>
+  </ul>
+</div>
+
                 ) : (
                   <div className="max-w-4xl mx-auto space-y-6">
                     {currentSession.messages.map((msg, index) => (
@@ -712,7 +722,7 @@ const ChatPage: React.FC = () => {
             </div>
 
             {/* Input Area - Fixed to bottom */}
-            <div className="border-t border-gray-200/50 bg-white/95 backdrop-blur-xl p-4 shadow-lg">
+            <div className=" bg-white/95 backdrop-blur-xl p-1 shadow-lg">
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-end space-x-3">
                   <div className="flex-1">

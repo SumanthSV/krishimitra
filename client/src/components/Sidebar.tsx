@@ -45,6 +45,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, toggleSidebar, drawerWidth }) =
 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  if (!isMobile) return null;
+
   return (
     <Drawer
       variant={isMobile ? "temporary" : "permanent"}
