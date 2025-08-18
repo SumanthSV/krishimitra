@@ -87,7 +87,7 @@ const HomePage = () => {
         <section className="flex text-green-500 rounded-2xl p-6 lg:p-10 max-w-2xl">
           <div className="flex flex-col items-start">
             <h1 className="text-4xl sm:text-5xl lg:text-7xl text-[#0f5d23] font-extralight leading-tight mb-4">
-              <span className="text-4xl sm:text-5xl lg:text-7xl text-[#0f5d23] font-extrabold leading-tight">AI</span> Welcome to KrishiMitra
+              <span className="text-4xl sm:text-5xl lg:text-7xl text-[#0f5d23] font-extrabold leading-tight">AI:</span> Welcome to KrishiMitra
             </h1>
             <p className="text-lg sm:text-xl text-[#154123] opacity-90 mb-6">Practical farming advice, weather, subsidies and localized recommendations to help you grow better.</p>
             
