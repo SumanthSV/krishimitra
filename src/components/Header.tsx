@@ -9,12 +9,9 @@ import {
   X,
 } from "lucide-react";
 
-interface HeaderProps {
-  sidebarOpen: boolean;
-  toggleSidebar: () => void;
-}
 
-const Header: React.FC<HeaderProps> = ({ sidebarOpen, toggleSidebar }) => {
+
+const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [

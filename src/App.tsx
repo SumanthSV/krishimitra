@@ -86,6 +86,7 @@ function App() {
           <AuthProvider>
             <OfflineDataProvider>
               <div className="flex flex-col min-h-screen bg-white  text-gray-900 dark:text-gray-100">
+                <Header sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
                 {!isOnline && <OfflineNotification />}
                 <div className="flex flex-1">
                   <main
