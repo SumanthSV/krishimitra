@@ -55,7 +55,6 @@ const PoliciesPage: React.FC = () => {
         { query, language }
       );
       setPolicyData(result.data);
-      console.log(result.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'searchError');
     } finally {

@@ -46,7 +46,6 @@ export default function Bank_policies() {
         { headers: { "Content-Type": "application/json" } }
       )
 
-      console.log("Response:", res.data)
       setPolicies(res.data)
     } catch (err: any) {
       console.error("Error during search:", err)
