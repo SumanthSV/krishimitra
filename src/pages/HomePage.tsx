@@ -20,8 +20,13 @@ import Footer from '../components/Footer.tsx';
 const HomePage = () => {
 
   useEffect(() => {
+
     const fetchData = async () => {
+      try{
         const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}`);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
 
     fetchData();
@@ -77,9 +82,9 @@ const HomePage = () => {
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
         }} 
-        className="h-screen -mt-14 flex flex-col lg:flex-row items-center justify-start px-4 sm:px-6 lg:px-20"
+        className="h-screen -mt-14 flex flex-col lg:flex-row items-center justify-center md:justify-start px-4 sm:px-6 lg:px-20"
       >
-        <section className="text-green-500 rounded-2xl p-6 lg:p-10 max-w-2xl">
+        <section className="flex text-green-500 rounded-2xl p-6 lg:p-10 max-w-2xl">
           <div className="flex flex-col items-start">
             <h1 className="text-4xl sm:text-5xl lg:text-7xl text-[#0f5d23] font-extralight leading-tight mb-4">
               <span className="text-4xl sm:text-5xl lg:text-7xl text-[#0f5d23] font-extrabold leading-tight">AI</span> Welcome to KrishiMitra

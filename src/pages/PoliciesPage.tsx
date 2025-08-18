@@ -137,7 +137,7 @@ const PoliciesPage: React.FC = () => {
                 className={`px-6 py-3 rounded-lg font-medium transition-all ${
                   !query.trim() || isLoading
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                    : 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl'
                 }`}
               >
                 {isLoading ? (
