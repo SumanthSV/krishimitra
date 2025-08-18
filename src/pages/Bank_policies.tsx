@@ -178,18 +178,24 @@ export default function Bank_policies() {
                     <div>
                       <h5 className="font-medium text-black mb-2">Eligibility</h5>
                       <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                        {policies[expandedScheme].eligibility.length > 0 && policies[expandedScheme].eligibility.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
+                        {Array.isArray(policies[expandedScheme].eligibility) 
+                          ? policies[expandedScheme].eligibility.map((item, idx) => (
+                              <li key={idx}>{item}</li>
+                            ))
+                          : <li>{policies[expandedScheme].eligibility || "No eligibility info available"}</li>
+                        }
                       </ul>
                     </div>
 
                     <div>
                       <h5 className="font-medium text-black mb-2">Benefits</h5>
                       <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                        {policies[expandedScheme].benefits.length > 0 && policies[expandedScheme].benefits.map((benefit, idx) => (
-                          <li key={idx}>{benefit}</li>
-                        ))}
+                        {Array.isArray(policies[expandedScheme].benefits) 
+                          ? policies[expandedScheme].benefits.map((benefit, idx) => (
+                              <li key={idx}>{benefit}</li>
+                            ))
+                          : <li>{policies[expandedScheme].benefits || "No benefits listed"}</li>
+                        }
                       </ul>
                     </div>
                   </div>
