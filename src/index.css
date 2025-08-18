@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  margin: 0;
+  font-family: 'Roboto', 'Segoe UI', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f5;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Support for multiple languages including those with different text directions */
+html[dir='rtl'] body {
+  text-align: right;
+}
+
+/* Accessibility improvements */
+:focus {
+  outline: 2px solid #4caf50;
+  outline-offset: 2px;
+}
+
+/* Mobile-first approach */
+* {
+  box-sizing: border-box;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  :root {
+    --primary-color: CanvasText;
+    --background-color: Canvas;
+  }
+}

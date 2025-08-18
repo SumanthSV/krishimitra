@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+  <!-- Background Circle -->
+  <circle cx="50" cy="50" r="48" fill="#4caf50" />
+  
+  <!-- Leaf Shape -->
+  <path d="M70,30 Q60,10 40,20 Q20,30 30,50 Q40,70 60,60 Q80,50 70,30 Z" fill="#ffffff" />
+  
+  <!-- Stem -->
+  <path d="M50,60 L50,85" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+  
+  <!-- Water Drop -->
+  <path d="M40,45 Q45,35 50,45 Q55,35 60,45 Q65,55 50,60 Q35,55 40,45 Z" fill="#2196f3" />
+</svg>
