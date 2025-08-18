@@ -241,7 +241,8 @@ export default function Bank_policies() {
 
       {/* Schemes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        {policies.map((scheme, index) => (
+
+        {policies.length > 0 && policies.map((scheme, index) => (
           <div key={index} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             {/* Header */}
             <div className="mb-4">
