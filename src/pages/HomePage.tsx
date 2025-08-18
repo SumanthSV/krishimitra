@@ -1,7 +1,6 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext.tsx';
-import { useLocation } from '../contexts/LocationContext.tsx';
+import axios from "axios";
 import HomepageImage from '../assests/Forest-2.png';
 import {
   Sprout,
@@ -19,8 +18,14 @@ import {
 import Footer from '../components/Footer.tsx';
 
 const HomePage = () => {
-  const { language } = useLanguage();
-  const { locationData } = useLocation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}`);
+    };
+
+    fetchData();
+  }, []);
 
   const features = [
     {
@@ -61,12 +66,6 @@ const HomePage = () => {
     // },
   ];
 
-  const weatherData = {
-    temperature: '32°C',
-    condition: 'Sunny',
-    humidity: '65%',
-    rainfall: '0mm',
-  };
 
   return (
     <div className="mx-auto max-w-9xl bg-white space-y-0 text-gray-800">
