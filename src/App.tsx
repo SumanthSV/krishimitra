@@ -20,7 +20,6 @@ import BankPolicies from './pages/Bank_policies.tsx';
 // Contexts
 
 import { LanguageProvider } from './contexts/LanguageContext.tsx';
-import { LocationProvider } from './contexts/LocationContext.tsx';
 import { OfflineDataProvider } from './contexts/OfflineDataContext.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { getOfflineService } from './services/OfflineService.ts';
@@ -83,7 +82,6 @@ function App() {
 
   return (
     <LanguageProvider>
-      <LocationProvider>
         <Router>
           <AuthProvider>
             <OfflineDataProvider>
@@ -110,8 +108,7 @@ function App() {
             </OfflineDataProvider>
           </AuthProvider>
         </Router>
-      </LocationProvider>
-    </LanguageProvider>
+      </LanguageProvider>
 
   );
 }
