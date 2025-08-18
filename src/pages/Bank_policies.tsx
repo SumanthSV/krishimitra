@@ -178,7 +178,7 @@ export default function Bank_policies() {
                     <div>
                       <h5 className="font-medium text-black mb-2">Eligibility</h5>
                       <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                        {policies[expandedScheme].eligibility.map((item, idx) => (
+                        {policies[expandedScheme].eligibility.length > 0 && policies[expandedScheme].eligibility.map((item, idx) => (
                           <li key={idx}>{item}</li>
                         ))}
                       </ul>
@@ -187,7 +187,7 @@ export default function Bank_policies() {
                     <div>
                       <h5 className="font-medium text-black mb-2">Benefits</h5>
                       <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                        {policies[expandedScheme].benefits.map((benefit, idx) => (
+                        {policies[expandedScheme].benefits.length > 0 && policies[expandedScheme].benefits.map((benefit, idx) => (
                           <li key={idx}>{benefit}</li>
                         ))}
                       </ul>
@@ -241,7 +241,6 @@ export default function Bank_policies() {
 
       {/* Schemes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-
         {policies.length > 0 && policies.map((scheme, index) => (
           <div key={index} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             {/* Header */}
