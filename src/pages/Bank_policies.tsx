@@ -57,9 +57,9 @@ export default function Bank_policies() {
 
 
   const sampleQueries = [
-    "What are the latest government schemes for farmers?",
+    "Are there bank subsidies for drip irrigation in sugarcane fields?",
     "How can I apply for a crop loan?",
-    "Are there any subsidies for organic farming?",
+    "Does any bank provide insurance for paddy farming?",
     "What are the eligibility criteria for government schemes?",
   ]
 
@@ -281,9 +281,23 @@ export default function Bank_policies() {
               >
                 View Details
               </button>
-              <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+              {scheme.source_url ? (
+              <a
+                href={scheme.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+              >
+                Apply Now
+              </a>
+            ) : (
+              <button
+                disabled
+                className="bg-gray-300 text-gray-600 px-4 py-2 rounded-lg font-medium text-sm cursor-not-allowed"
+              >
                 Apply Now
               </button>
+            )}
             </div>
           </div>
         ))}
