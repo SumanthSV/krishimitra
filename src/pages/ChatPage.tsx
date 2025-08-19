@@ -16,7 +16,7 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  // const [selectedLanguage, setSelectedLanguage] = useState("en");
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -48,7 +48,7 @@ const ChatPage: React.FC = () => {
     try {
       const query = {
         text: userMessage.content,
-        language: selectedLanguage,
+        // language: selectedLanguage,
       };
 
       const response = await axios.post(
@@ -229,7 +229,7 @@ const ChatPage: React.FC = () => {
               <button
                 onClick={handleSendMessage}
                 disabled={!message.trim() || isLoading}
-                className={`flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+                className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 ${
                   !message.trim() || isLoading
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                     : "bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
