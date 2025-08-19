@@ -16,6 +16,7 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -47,6 +48,7 @@ const ChatPage: React.FC = () => {
     try {
       const query = {
         text: userMessage.content,
+        language: selectedLanguage,
       };
 
       const response = await axios.post(
@@ -195,6 +197,21 @@ const ChatPage: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-end space-x-3">
             <div className="flex-1">
+              {/* <div>
+                <select
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                  className="border-2 border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:border-green-500 focus:ring-2 focus:ring-green-200"
+                >
+                  <option value="en">English</option>
+                  <option value="hi">Hindi</option>
+                  <option value="kn">Kannada</option>
+                  <option value="te">Telugu</option>
+                  <option value="ta">Tamil</option>
+                  <option value="mr">Marathi</option>
+                  <option value="bn">Bengali</option>
+                </select>
+              </div> */}
               <textarea
                 ref={inputRef}
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-800 resize-none transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 placeholder-gray-500"

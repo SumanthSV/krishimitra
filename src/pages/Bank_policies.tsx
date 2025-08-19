@@ -46,8 +46,13 @@ export default function Bank_policies() {
         { query: searchQuery },
         { headers: { "Content-Type": "application/json" } }
       )
-
-      setPolicies(res.data)
+      let text = res.data
+      // console.log("Response:", res.data)
+      text = text.replace(/json|/g, "").trim();
+      const dataO = JSON.parse(text);
+      // console.log("Parsed Data:", dataO)
+      setPolicies(dataO)
+      // setPolicies(res.data)
     } catch (err: any) {
       console.error("Error during search:", err)
       setError("Something went wrong while fetching policies. Please try again.")
