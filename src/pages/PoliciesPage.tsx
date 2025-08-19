@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext.tsx';
 import axios from 'axios';
 
@@ -24,7 +23,6 @@ import VoiceInput from '../components/VoiceInput.tsx';
 
 
 const PoliciesPage: React.FC = () => {
-  const { t } = useTranslation();
   const { language } = useLanguage();
 
 
@@ -103,7 +101,7 @@ const PoliciesPage: React.FC = () => {
               <FileText className="w-8 h-8 text-white" />
             </div> */}
           </div>
-          <p className="text-2xl font-bold text-gray-900 mb-2">Schemes Recommendations</p>
+          <p className="text-4xl font-bold text-gray-900 mb-2">Schemes Recommendations</p>
           <p className="text-md text-gray-600 max-w-2xl mx-auto">Search and access government schemes that best match your requirements.</p>
         </div>
 
@@ -121,7 +119,6 @@ const PoliciesPage: React.FC = () => {
              onChange={(e) => setQuery(e.target.value)}
              onKeyPress={handleKeyPress}
              disabled={isLoading}
-                
                 />
                 {/* <textarea
                   rows={2}
@@ -257,8 +254,8 @@ const PoliciesPage: React.FC = () => {
         {!isLoading && !policyData && !error && query && (
           <div className="text-center py-12">
             <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('policies.noResults')}</h3>
-            <p className="text-gray-500">{t('policies.tryDifferentQuery')}</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No results</h3>
+            <p className="text-gray-500">Try a different query</p>
           </div>
         )}
       </div>
