@@ -102,7 +102,7 @@ export default function Bank_policies() {
             />
           </div>
           <button
-            className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className=" border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-12 h-12"
             disabled={loading}
           >
             <VoiceInput onResult={handleVoiceResult} disabled={loading} />
