@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { ExternalLink, Mic, Search, X, Loader2,AlertCircle } from "lucide-react"
 import axios from "axios"
+import VoiceInput from '../components/VoiceInput.tsx'
 
 interface Scheme {
   name: string
@@ -55,12 +56,16 @@ export default function Bank_policies() {
     }
   }
 
+  const handleVoiceResult = (transcript: string) => {
+    setSearchQuery(transcript);
+  };
+
 
   const sampleQueries = [
     "Are there bank subsidies for drip irrigation in sugarcane fields?",
-    "How can I apply for a crop loan?",
+    "Is there a loan policy for dairy farmers to buy cattle?",
     "Does any bank provide insurance for paddy farming?",
-    "What are the eligibility criteria for government schemes?",
+    "Does the bank support loans for sericulture (silk farming)?",
   ]
 
 
@@ -95,7 +100,7 @@ export default function Bank_policies() {
             className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             disabled={loading}
           >
-            <Mic className="w-5 h-5 text-gray-400" />
+            <VoiceInput onResult={handleVoiceResult} disabled={loading} />
           </button>
           <button
             onClick={handleSearch}
